@@ -6,6 +6,7 @@ const logger = require('morgan'); // 日志
 const cors = require('cors'); //跨域
 
 const api = require('./router/api');
+const upload = require('./router/api/upload');
 
 const app = express();
 
@@ -15,7 +16,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 使用html渲染
+app.set('views', path.join('views/upload.html'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
 app.use('/', api);
+app.use('/upload', upload);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
