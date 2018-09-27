@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const getUserInfo = require('../../service/userService');
 /* GET home page. */
 router.get('/', async function(req, res, next) {
