@@ -1,26 +1,46 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('User', {
+  return sequelize.define('user', {
     id: {
-      field: 'id',
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.INTEGER(11).UNSIGNED,
       allowNull: false,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true,
+      field: 'id'
+    },
+    iphone: {
+      type: DataTypes.CHAR(11),
+      allowNull: true,
+      field: 'iphone'
     },
     username: {
-      field: 'username',
       type: DataTypes.CHAR(11),
-      allowNull: true
+      allowNull: true,
+      field: 'username'
     },
     password: {
-      field: 'password',
-      type: DataTypes.CHAR(50),
-      allowNull: true
+      type: DataTypes.CHAR(100),
+      allowNull: true,
+      field: 'password'
+    },
+    role: {
+      type: DataTypes.INTEGER(11).UNSIGNED,
+      allowNull: false,
+      defaultValue: '1',
+      field: 'role'
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'createdAt'
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      field: 'updatedAt'
     }
   }, {
-    tableName: 'user',
-    timestamps: false,
-    freezeTableName: true
+    tableName: 'User'
   });
 };

@@ -8,7 +8,7 @@ const app = require('../app');
 const debug = require('debug')('mynode:server');
 const http = require('http');
 // 启动mongo数据库服务
-const mongoose = require('../db/mongo');
+// const mongoose = require('../db/mongo');
 const mysql = require('../db/mysql');
 
 /**

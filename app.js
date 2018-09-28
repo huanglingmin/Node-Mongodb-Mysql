@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan'); // 日志
 const cors = require('cors'); //跨域
+// const middleware = require('./middleware/index.js'); // 中间件
 
 const api = require('./router/api');
 const upload = require('./router/api/upload');
@@ -22,7 +23,7 @@ app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
 app.use('/', api);
-app.use('/upload', upload);
+// app.use('/upload', upload);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

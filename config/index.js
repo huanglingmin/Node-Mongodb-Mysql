@@ -2,18 +2,18 @@ const config = {
   mongodb: {
     // user: 'admin',
     // pwd: '123456',
-    host: 'localhost',
+    host: '10.255.4.98',
     port: '27017',
     database: 'weixin',
     // authSource: 'admin',
   },
   mysql: {
-    username: 'root',
+    username: 'hlm',
     password: 'Root@123',
     host: 'localhost',
     port: '3306',
     // database: 'weixin',
-    database: 'weixin',
+    database: 'node',
     dialect: 'mysql',
   },
 };
