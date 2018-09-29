@@ -1,17 +1,18 @@
 const models = require('../models');
-const crypto = require('crypto');
 const Utils = require('../tool/utils.js');
 
 // 登陆
-async function getUserInfo(body) {
+async function userLogin(body) {
   try {
-    const data = await models.User.findOne({
+    return await models.User.findOne({
+      attributes: {
+        exclude: ['password', 'updatedAt', 'createdAt']
+      },
       where: {
-        iphone: body.iphone
+        iphone: body.iphone,
+        password: Utils.encryptPassword(body.password)
       }
     });
-    console.log(data, 89889888);
-    return data;
   } catch (error) {
     console.log('error');
   }
@@ -31,7 +32,7 @@ async function register(iphone = '', username = '', password = '', id = 0, role 
         role
       }
       if (params.id <= 0) {
-        params.password = crypto.createHash('sha1').update(params.password).digest('hex');
+        params.password = Utils.encryptPassword(params.password);
         return await models.User.upsert(params);
       }
     }
@@ -76,11 +77,8 @@ async function getUserList(pageNum = 1, pageSize = 10) {
   }
 }
 
-// 验证账号密码是否正确
-// verify
-
 module.exports = {
-  getUserInfo,
+  userLogin,
   register,
   getUserList
 };

@@ -4,23 +4,21 @@ const USER = require('../../service/userService');
 
 // 登陆
 router.post('/login', async function (req, res, next) {
-  const params = {
-    data: await USER.getUserInfo(req.body)
-  };
-  res.send(params);
+  const result = await USER.userLogin(req.body);
+  if (result) {
+    res.ok('登陆成功', result)
+  } else {
+    res.forbidden('用户名或密码错误!');
+  }
 });
 
 // 注册
 router.post('/register', async function (req, res, next) {
-  const status = await USER.register(...Object.values(req.body));
-  if (status) {
-    res.json({
-      msg: 'success注册成功'
-    });
+  const result = await USER.register(req.body.iphone, req.body.username, req.body.password);
+  if (result) {
+    res.ok('注册成功', result)
   } else {
-    res.json({
-      msg: 'error手机号已经注册了'
-    });
+    res.forbidden('手机号已注册!');
   }
 });
 
@@ -28,13 +26,11 @@ router.post('/register', async function (req, res, next) {
 router.get('/user_list', async (req, res, next) => {
   req.query.pageNum = Math.floor(req.query.pageNum);
   req.query.pageSize = Math.floor(req.query.pageSize);
-  const data = await USER.getUserList(...Object.values(req.query));
-  if (data) {
-    res.json(data)
+  const result = await USER.getUserList(req.query.pageNum, req.query.pageSize);
+  if (result) {
+    res.ok('success', result)
   } else {
-    res.json({
-      mes: 'errr'
-    })
+    res.forbidden('error!');
   }
 });
 module.exports = router;

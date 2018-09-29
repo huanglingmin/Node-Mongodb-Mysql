@@ -1,4 +1,6 @@
-const utf8 = require('./utf-8.js');
+const response = require('./response.js');
 module.exports = {
-    utf8
+    beforeRouter(app) {
+        response(app);
+    }
 };
