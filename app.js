@@ -1,36 +1,37 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
+// const cookieParser = require('cookie-parser');
 const logger = require('morgan'); // 日志
-const cors = require('cors'); //跨域
+const cors = require('cors'); // 跨域
 const middleware = require('./middleware'); // 中间件
 
-const api = require('./router/api');
+const user = require('./router/api/user');
 const upload = require('./router/api/upload');
 
 const app = express();
 
 app.use(cors());
+app.use(logger('combined'));
 app.use(express.json());
 app.use(express.urlencoded({
   extended: false
 }));
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 middleware.beforeRouter(app);
 
 // 使用html渲染
-app.set('views', path.join('views/upload.html'));
+// app.set('views', path.join('views/upload.html'));
+app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
-app.use('/', api);
+app.use('/', user);
 app.use('/upload', upload);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  // console.log(req.url, 99999999);
   next(createError(404));
 });
 
@@ -44,5 +45,6 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
 
 module.exports = app;
