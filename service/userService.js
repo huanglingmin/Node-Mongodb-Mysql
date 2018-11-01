@@ -6,6 +6,7 @@ async function userLogin(body) {
   try {
     return await models.User.findOne({
       attributes: {
+        // 排除指定属性
         exclude: ['password', 'updatedAt', 'createdAt']
       },
       where: {
@@ -63,7 +64,10 @@ async function getUserList(pageNum = 1, pageSize = 10) {
     const offset = Utils.offsetPage(pageNum, pageSize);
     // 分页查找 findAndCountAll
     const data = await models.User.findAndCountAll({
-      attributes: ['createdAt', 'iphone', 'username'],
+      attributes: ['createdAt', 'iphone', 'username', 'id'],
+      where: {
+        delete: 0
+      },
       order: [
         ['createdAt', 'DESC']
       ],
@@ -77,8 +81,29 @@ async function getUserList(pageNum = 1, pageSize = 10) {
   }
 }
 
+// 删除用户(软删除)
+async function delUserList(id = "") {
+  try {
+    // return await models.User.destroy({
+    //   where: {
+    //     id
+    //   }
+    // });
+    return await models.User.update({
+      delete: 1
+    }, {
+      where: {
+        id
+      },
+      fields: ['delete']
+    });
+  } catch (error) {
+    console.log('error');
+  }
+}
 module.exports = {
   userLogin,
   register,
-  getUserList
+  getUserList,
+  delUserList
 };

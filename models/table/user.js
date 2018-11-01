@@ -30,6 +30,12 @@ module.exports = function(sequelize, DataTypes) {
       defaultValue: '1',
       field: 'role'
     },
+    delete: {
+      type: DataTypes.INTEGER(1).UNSIGNED,
+      allowNull: false,
+      defaultValue: '0',
+      field: 'delete'
+    },
     createdAt: {
       type: DataTypes.DATE,
       allowNull: true,
@@ -43,6 +49,6 @@ module.exports = function(sequelize, DataTypes) {
       field: 'updatedAt'
     }
   }, {
-    tableName: 'User'
+    tableName: 'user'
   });
 };

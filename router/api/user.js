@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const USER = require('../../service/userService');
+const AETICLE = require('../../service/articleService');
 const Utils = require('../../tool/utils');
 
 // 登陆
@@ -37,10 +38,20 @@ router.get('/userList', async (req, res, next) => {
   req.query.pageNum = Math.floor(req.query.pageNum);
   req.query.pageSize = Math.floor(req.query.pageSize);
   const result = await USER.getUserList(req.query.pageNum, req.query.pageSize);
+  // const result = await AETICLE.getArticleList(req.query.pageNum, req.query.pageSize);
   if (result) {
     res.ok('success', result)
   } else {
     res.forbidden('error!');
+  }
+});
+// 删除用户
+router.post('/delUserList', async (req, res, next) => {
+  const result = await USER.delUserList(req.body.id);
+  if (result) {
+    res.ok('success', '删除成功')
+  } else {
+    res.forbidden('删除失败');
   }
 });
 module.exports = router;
