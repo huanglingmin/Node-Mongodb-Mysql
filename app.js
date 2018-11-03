@@ -9,6 +9,8 @@ const middleware = require('./middleware'); // 中间件
 const user = require('./router/api/user');
 const upload = require('./router/api/upload');
 
+// const API = require('./router/index');
+
 const app = express();
 
 app.use(cors());
@@ -27,8 +29,15 @@ app.set('views', path.join(__dirname, 'views'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 
-app.use('/', user);
-app.use('/upload', upload);
+app.use('/node/user', user);
+app.use('/node/upload', upload);
+
+// app.use('/api', API);
+
+// 默认访问的页面
+app.get('/', function (req, res) {
+  res.render('index');
+})
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
