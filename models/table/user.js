@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
-
-module.exports = function(sequelize, DataTypes) {
+const moment = require('moment');
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('user', {
     id: {
       type: DataTypes.INTEGER(11).UNSIGNED,
@@ -40,7 +40,10 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.DATE,
       allowNull: true,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-      field: 'createdAt'
+      field: 'createdAt',
+      get () {
+        return moment(this.getDataValue('createdAt')).format('YYYY-MM-DD HH:mm:ss');
+      }
     },
     updatedAt: {
       type: DataTypes.DATE,
@@ -49,6 +52,6 @@ module.exports = function(sequelize, DataTypes) {
       field: 'updatedAt'
     }
   }, {
-    tableName: 'user'
-  });
+      tableName: 'user'
+    });
 };
