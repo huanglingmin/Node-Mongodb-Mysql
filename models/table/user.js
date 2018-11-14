@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 const moment = require('moment');
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('user', {
     id: {
       type: DataTypes.INTEGER(11).UNSIGNED,
@@ -10,19 +10,29 @@ module.exports = function (sequelize, DataTypes) {
       field: 'id'
     },
     iphone: {
-      type: DataTypes.CHAR(11),
+      type: DataTypes.STRING(11),
       allowNull: true,
       field: 'iphone'
     },
-    username: {
-      type: DataTypes.CHAR(11),
+    nickname: {
+      type: DataTypes.STRING(11),
       allowNull: true,
-      field: 'username'
+      field: 'nickname'
     },
     password: {
-      type: DataTypes.CHAR(255),
+      type: DataTypes.STRING(255),
       allowNull: true,
       field: 'password'
+    },
+    email: {
+      type: DataTypes.STRING(50),
+      allowNull: true,
+      field: 'email'
+    },
+    residence: {
+      type: DataTypes.STRING(30),
+      allowNull: true,
+      field: 'residence'
     },
     role: {
       type: DataTypes.INTEGER(11).UNSIGNED,

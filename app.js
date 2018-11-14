@@ -34,9 +34,10 @@ app.use('/node/upload', upload);
 
 // app.use('/api', API);
 
-// 默认访问的页面
-app.get('/', function (req, res) {
-  res.render('index');
+// 在你应用 JavaScript 文件中包含了一个 script 标签
+// 的 index.html 中处理任何一个 route
+app.get('*', function (req, res) {
+  res.sendFile(path.resolve(__dirname, 'views', 'index.html'))
 })
 
 // catch 404 and forward to error handler

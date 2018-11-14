@@ -1,0 +1,2688 @@
+<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta name="baidu-site-verification" content="O5DO1n0DYd" />
+	<meta name="google-site-verification" content="JpblxCnu30QFTXwwVV3BFBDP9ObDXUOXlhFWiVIYsOo" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="&lt;code&gt;Model&lt;/code&gt;相当于数据库中表，有时它也会被称为“模型”或“工厂”。&lt;code&gt;Model&lt;/code&gt;不能通过构造函数创建，而只能通过&lt;code&gt;sequlize.define&lt;/code&gt;方法来定义或通过&lt;code&gt;sequlize.import&lt;/code&gt;导入。通过&lt;code&gt;define&lt;/code&gt;定义一个&lt;code&gt;Model&lt;/code&gt;，就相当于定义了一种模型与数据表之间的映射关系，通过模型可以实现对表记录的增、删、改、查等操作。" />
+	<title>Sequelize 中文API文档－2. Model 的定义、使用与Model类的API - IT笔录</title>
+	<link rel="canonical" href="//itbilu.com/nodejs/npm/V1PExztfb.html"/>
+	<link rel="icon" href="/img/logo_32X32.ico" type="image/x-icon" />
+	<link href="//cdn.itbilu.com/css/main-min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+     <div class="container">
+          <div class="navbar navbar-default" role="navigation">
+               <div class="navbar-header">
+                    <a class="navbar-brand" href="/"> 
+                         <img src="/img/logo.png" alt="optional logo" height="90" width="90"> 
+                         <span class="logo_title"><strong>IT笔录</strong></span> 
+                         <span class="logo_subtitle">学习，记录，整理</span> 
+                    </a>
+                    <a class="btn btn-navbar btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                         <span class="nb_left pull-left"> 
+                              <span class="fa fa-reorder"></span>
+                         </span>
+                         <span class="nb_right pull-right">menu</span>
+                    </a>
+               </div>
+               <div class="collapse navbar-collapse">
+                    <ul class="nav pull-right navbar-nav">
+                         <li ><a href="/">首页</a></li>
+                         <li  class="active"><a href="/nodejs">Nodejs</a></li>
+                         <li ><a href="/javascript">javaScript</a></li>
+                         <li ><a href="/database">数据库</a></li>
+                         <li ><a href="/linux">Linux</a></li>
+                         <li ><a href="/tools">工具</a></li>
+                         <li ><a href="/other">其它</a></li>
+                    </ul>
+               </div>
+          </div>
+     </div>
+</header>
+<div class="main">
+<div class="container">
+    <section>
+         <div class="row breadcrumb-row">
+      <ul class="breadcrumb">
+      	
+      		<li><a href="/">首页</a></li>
+      		
+      		    
+                <li><a href="/nodejs">Node.js</a></li>
+                
+                    <li><a href="/nodejs/npm">包、应用</a></li>
+                
+              
+      		
+      	
+      </ul>
+ </div>
+         <div class="row">
+              <div id="leftcol" class="col-sm-8 col-md-8">
+                 <h1>Sequelize 中文API文档－2. Model 的定义、使用与Model类的API</h1>
+                   <p><i class="fa fa-clock-o" title="发布时间"></i>&nbsp;2016年05月21日
+                   &nbsp;&nbsp;
+                   <i class="fa fa-eye" title="阅读"></i>
+                   111551
+                   &nbsp;&nbsp;
+                   <span data-toggle="tooltip" title="声明：本站文章及示例基于特定的环境或软件版本，本站不为因参考本站文章引起的错误或损失负责。在使用前请自行验证是否可用于实际环境。如有纰漏或错误，欢迎进群指正、交流。"><i class="fa fa-exclamation-circle"></i>&nbsp;声明</span>
+                  </p>
+                   <article class="post">
+                        <div class="post_content">
+                        
+                        
+<p><br /></p>
+<p><code>Model</code>相当于数据库中表，有时它也会被称为“模型”或“工厂”。<code>Model</code>不能通过构造函数创建，而只能通过<code>sequlize.define</code>方法来定义或通过<code>sequlize.import</code>导入。通过<code>define</code>定义一个<code>Model</code>，就相当于定义了一种模型与数据表之间的映射关系，通过模型可以实现对表记录的增、删、改、查等操作。</p>
+<ol>
+	<li><a href="#definition">定义描述</a>
+  <ul>
+    <li><a href="#definition-define">1.1 Definition - 模型定义</a></li>
+    <li><a href="#definition-dataType">1.2 Data types - 数据类型</a></li>
+    <li><a href="#definition-deferrable">1.3 Deferrable - 延时执行</a></li>
+    <li><a href="#definition-getter-setter">1.4 Getters & setters - 访问器&设置器</a></li>
+    <li><a href="#definition-validations">1.5 Validations - 验证</a></li>
+    <li><a href="#definition-configuration">1.6 Configuration - 配置</a></li>
+    <li><a href="#definition-import">1.7 Import - 模型导入</a></li>
+    <li><a href="#definition-sync">1.8 Database synchronization - 数据库同步</a></li>
+    <li><a href="#definition-expansion">1.9 Expansion of models - 模型扩展</a></li>
+  </ul>
+  </li>
+  <li><a href="#usage">模型的使用</a>
+  <ul>
+    <li><a href="#usage-find">2.1 Data retrieval / Finders - 数据索引/查找</a></li>
+    <li><a href="#usage-eager-loading">2.2 Eager loading - 预加载</a></li>
+  </ul>
+  </li>
+  <li><a href="#api"><code>Model</code>类的API</a>
+  <ul>
+    <li><a href="#api-removeAttribute">3.1 <code>removeAttribute()</code> - 移除属性</a></li>
+    <li><a href="#api-sync">3.2 <code>sync()</code> - 同步模型到数据库</a></li>
+    <li><a href="#api-drop">3.3 <code>drop()</code> - 删除数据库中的表</a></li>
+    <li><a href="#api-schema">3.4 <code>schema()</code> - 指定<code>schema</code></a></li>
+    <li><a href="#api-getTableName">3.5 <code>getTableName()</code> - 获取表名</a></li>
+    <li><a href="#api-addScope">3.6 <code>addScope()</code> - 添加限制范围</a></li>
+    <li><a href="#api-scope">3.7 <code>scope()</code> - 应用限制范围</a></li>
+    <li><a href="#api-findAll">3.8 <code>findAll()</code> - 查询多条数据</a></li>
+    <li><a href="#api-findById">3.9 <code>findById()</code> - 通过Id查询单条数据</a></li>
+    <li><a href="#api-findOne">3.10 <code>findOne()</code> - 通过单条数据</a></li>
+    <li><a href="#api-aggregate">3.11 <code>aggregate()</code> - 聚合查询</a></li>
+    <li><a href="#api-count">3.12 <code>count()</code> - 统计查询结果数</a></li>
+    <li><a href="#api-findAndCount">3.13 <code>findAndCount()</code> - 分页查询</a></li>
+    <li><a href="#api-max">3.14 <code>max()</code> - 查询最大值</a></li>
+    <li><a href="#api-min">3.15 <code>min()</code> - 查询最大值</a></li>
+    <li><a href="#api-sum">3.16 <code>sum()</code> - 求和</a></li>
+    <li><a href="#api-build">3.17 <code>build()</code> - 创建新实例</a></li>
+    <li><a href="#api-create">3.18 <code>create()</code> - 创建保存新实例</a></li>
+    <li><a href="#api-findOrInitialize">3.19 <code>findOrInitialize()</code> - 查找或初始化</a></li>
+    <li><a href="#api-findOrCreate">3.20 <code>findOrCreate()</code> - 查找或创建</a></li>
+    <li><a href="#api-findCreateFind">3.21 <code>findCreateFind()</code> - 查找或创建</a></li>
+    <li><a href="#api-upsert">3.22 <code>upsert()</code> - 创建或更新</a></li>
+    <li><a href="#api-bulkCreate">3.23 <code>bulkCreate()</code> - 创建多条记录</a></li>
+    <li><a href="#api-truncate">3.24 <code>truncate()</code> - 截断模型</a></li>
+    <li><a href="#api-destroy">3.25 <code>destroy()</code> - 删除记录</a></li>
+    <li><a href="#api-restore">3.26 <code>restore()</code> - 恢复记录</a></li>
+    <li><a href="#api-update">3.27 <code>update()</code> - 更新记录</a></li>
+    <li><a href="#api-describe">3.28 <code>describe()</code> - 查询表信息</a></li>
+  </ul>
+  </li>
+</ol>
+<h3 id="definition">1. 定义描述</h3>
+<h4 id="definition-define">1.1 Definition - 模型定义</h4>
+<p>定义模型<code>model</code>和表之间的映射关系使用<code>define</code>方法。定义时Sequelize会自动为其添加<code>createdAt</code>和<code>updatedAt</code>两个属性（属性相当于表中的字段），这样你就可以知道数据什么时候插入了数据库和什么时候进行了更新。</p>
+<pre>var Project = sequelize.define('project', {
+  title: Sequelize.STRING,
+  description: Sequelize.TEXT
+})
+
+var Task = sequelize.define('task', {
+  title: Sequelize.STRING,
+  description: Sequelize.TEXT,
+  deadline: Sequelize.DATE
+})</pre>
+<p>定义模型时可以为列设置一些选项：</p>
+<pre>var Foo = sequelize.define('foo', {
+ // 实例化时在没有显式设置属性值时，会自动设置为 true
+ flag: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: true},
+
+ // 日期默认值 => 当前时间
+ myDate: { type: Sequelize.DATE, defaultValue: Sequelize.NOW },
+
+ // 设置 allowNull 选项为 false 后，会为列添加  NOT NULL 非空限制
+ // 这意味着当执行查询（插入/更新）时相关字段为空会从数据库层抛出错误
+ // 如果想在执行查询时进行值检测，请参考“验证”一节
+ title: { type: Sequelize.STRING, allowNull: false},
+
+ // 添加唯一（unique）约束后插入重复值会报错
+ // unique属性可以是boolean 或 string类型
+ // 如果为多个字段添加了相同的字符串那么将会是一个符合唯一键
+ someUnique: {type: Sequelize.STRING, unique: true},
+ uniqueOne: { type: Sequelize.STRING,  unique: 'compositeIndex'},
+ uniqueTwo: { type: Sequelize.INTEGER, unique: 'compositeIndex'}
+
+ // unique属性以一个简单的简写方式创建唯一索引
+ someUnique: {type: Sequelize.STRING, unique: true}
+ // 同样的，也可以模型的选项中创建索引
+ {someUnique: {type: Sequelize.STRING}},
+ {indexes: [{unique: true, fields: ['someUnique']}]}
+
+ // 定义一个主键
+ identifier: { type: Sequelize.STRING, primaryKey: true},
+
+ // autoIncrement 选项用于创建一个自增的整型列
+ incrementMe: { type: Sequelize.INTEGER, autoIncrement: true },
+
+ // Comments 可以在MySQL 和 PG中指定定段描述
+ hasComment: { type: Sequelize.INTEGER, comment: "I'm a comment!" },
+
+ // 可以通过 "field" 属性来指定数据库中的字段名
+ fieldWithUnderscores: { type: Sequelize.STRING, field: "field_with_underscores" },
+
+ // 通过references选项可以创建外键:
+ bar_id: {
+   type: Sequelize.INTEGER,
+
+   references: {
+     // 引用另一个模型
+     model: Bar,
+
+     // 连接模型的列表
+     key: 'id',
+
+     // 强制使用外键约束，仅适用于 PostgreSQL
+     deferrable: Sequelize.Deferrable.INITIALLY_IMMEDIATE
+   }
+ }
+})</pre>
+<p>如果你不想在模型中使用时间戳，而只需要一些时间；或者你正在使用一个已经存在的数据库，而其中的列名与你的所需要并不一致。更多配置请参考<a href="#definition-configuration">模型配置</a>。</p>
+<p><br /></p>
+<h4 id="definition-dataType">1.2 Data types - 数据类型</h4>
+<p>在定义模型时，我们会指定其属性（字段）的数据类型，下面是Sequelize中支持数据类型及其与数据库中字段类型的对应关系：</p>
+<pre>Sequelize.STRING                      // VARCHAR(255)
+Sequelize.STRING(1234)                // VARCHAR(1234)
+Sequelize.STRING.BINARY               // VARCHAR BINARY
+Sequelize.TEXT                        // TEXT
+Sequelize.TEXT('tiny')                // TINYTEXT
+
+Sequelize.INTEGER                     // INTEGER
+Sequelize.BIGINT                      // BIGINT
+Sequelize.BIGINT(11)                  // BIGINT(11)
+
+Sequelize.FLOAT                       // FLOAT
+Sequelize.FLOAT(11)                   // FLOAT(11)
+Sequelize.FLOAT(11, 12)               // FLOAT(11,12)
+
+Sequelize.REAL                        // REAL        PostgreSQL only.
+Sequelize.REAL(11)                    // REAL(11)    PostgreSQL only.
+Sequelize.REAL(11, 12)                // REAL(11,12) PostgreSQL only.
+
+Sequelize.DOUBLE                      // DOUBLE
+Sequelize.DOUBLE(11)                  // DOUBLE(11)
+Sequelize.DOUBLE(11, 12)              // DOUBLE(11,12)
+
+Sequelize.DECIMAL                     // DECIMAL
+Sequelize.DECIMAL(10, 2)              // DECIMAL(10,2)
+
+Sequelize.DATE                        // DATETIME for mysql / sqlite, TIMESTAMP WITH TIME ZONE for postgres
+Sequelize.DATE(6)                     // DATETIME(6) for mysql 5.6.4+. Fractional seconds support with up to 6 digits of precision 
+Sequelize.DATEONLY                    // DATE without time.
+Sequelize.BOOLEAN                     // TINYINT(1)
+
+Sequelize.ENUM('value 1', 'value 2')  // An ENUM with allowed values 'value 1' and 'value 2'
+Sequelize.ARRAY(Sequelize.TEXT)       // Defines an array. PostgreSQL only.
+
+Sequelize.JSON                        // JSON column. PostgreSQL only.
+Sequelize.JSONB                       // JSONB column. PostgreSQL only.
+
+Sequelize.BLOB                        // BLOB (bytea for PostgreSQL)
+Sequelize.BLOB('tiny')                // TINYBLOB (bytea for PostgreSQL. Other options are medium and long)
+
+Sequelize.UUID                        //   PostgreSQL 和 SQLite 中为 UUID, MySQL 中为CHAR(36) BINARY (使用 defaultValue: Sequelize.UUIDV1 或 Sequelize.UUIDV4 生成默认值)
+
+Sequelize.RANGE(Sequelize.INTEGER)    // Defines int4range range. PostgreSQL only.
+Sequelize.RANGE(Sequelize.BIGINT)     // Defined int8range range. PostgreSQL only.
+Sequelize.RANGE(Sequelize.DATE)       // Defines tstzrange range. PostgreSQL only.
+Sequelize.RANGE(Sequelize.DATEONLY)   // Defines daterange range. PostgreSQL only.
+Sequelize.RANGE(Sequelize.DECIMAL)    // Defines numrange range. PostgreSQL only.
+
+Sequelize.ARRAY(Sequelize.RANGE(Sequelize.DATE)) // Defines array of tstzrange ranges. PostgreSQL only.
+
+Sequelize.GEOMETRY                    // Spatial column.  PostgreSQL (with PostGIS) or MySQL only.
+Sequelize.GEOMETRY('POINT')           // Spatial column with geomerty type.  PostgreSQL (with PostGIS) or MySQL only.
+Sequelize.GEOMETRY('POINT', 4326)     // Spatial column with geomerty type and SRID.  PostgreSQL (with PostGIS) or MySQL only.</pre>
+<p><code>BLOB</code>类型中你可以插入字符串或二进制<code>buffer</code>，在进行查询时其总是会返回<code>buffer</code>。</p>
+<p>如果要使用PostgreSQL的<code>TIMESTAMP WITHOUT TIME ZONE</code>类型，那么你需要存入一个不同的时区，并使用<code>pg</code>库进行转换</p>
+<pre>require('pg').types.setTypeParser(1114, function(stringValue) {
+  return new Date(stringValue + "+0000");
+  // e.g., UTC offset. Use any offset that you would like.
+});</pre>
+<p>下面是一个额外支持的类型，如：integer, bigint, float 和 double 也同样支持 unsigned 和 zerofill。但这些属性并不能在PostgreSQL中使用：</p>
+<pre>Sequelize.INTEGER.UNSIGNED              // INTEGER UNSIGNED
+Sequelize.INTEGER(11).UNSIGNED          // INTEGER(11) UNSIGNED
+Sequelize.INTEGER(11).ZEROFILL          // INTEGER(11) ZEROFILL
+Sequelize.INTEGER(11).ZEROFILL.UNSIGNED // INTEGER(11) UNSIGNED ZEROFILL</pre>
+<p>使用一个更加自然的对象：</p>
+<pre>// 枚举
+sequelize.define('model', {
+  states: {
+    type:   Sequelize.ENUM,
+    values: ['active', 'pending', 'deleted']
+  }
+})
+</pre>
+<p><br /></p>
+<h4 id="definition-deferrable">1.3 Deferrable - 延时执行</h4>
+<p>当你指定一个可选的外键列，那么可以在PostgreSQL定义为<code>Deferrable</code>类型。以下选项可用：</p>
+<pre>// Defer all foreign key constraint check to the end of a transaction
+Sequelize.Deferrable.INITIALLY_DEFERRED
+
+// Immediately check the foreign key constraints
+Sequelize.Deferrable.INITIALLY_IMMEDIATE
+
+// Don't defer the checks at all
+Sequelize.Deferrable.NOT</pre>
+<p><br /></p>
+<h4 id="definition-getter-setter">1.4 Getters & setters - 访问器&设置器</h4>
+<p>可以在你的模型中将对象属性定义为访问/设置函数</p>
+<p>访问器&设置器有以下两种定义方式：</p>
+<ul>
+  <li>做为一个属性定义</li>
+  <li>做为模型选项</li>
+</ul>
+<p><strong>做为一个属性定义</strong></p>
+<pre>var Employee = sequelize.define('employee', {
+  name:  {
+    type     : Sequelize.STRING,
+    allowNull: false,
+    get      : function()  {
+      var title = this.getDataValue('title');
+      // 'this' allows you to access attributes of the instance
+      return this.getDataValue('name') + ' (' + title + ')';
+    },
+  },
+  title: {
+    type     : Sequelize.STRING,
+    allowNull: false,
+    set      : function(val) {
+      this.setDataValue('title', val.toUpperCase());
+    }
+  }
+});
+
+Employee
+  .create({ name: 'John Doe', title: 'senior engineer' })
+  .then(function(employee) {
+    console.log(employee.get('name')); // John Doe (SENIOR ENGINEER)
+    console.log(employee.get('title')); // SENIOR ENGINEER
+  })</pre>
+<p><strong>做为模型选项</strong></p>
+<p>在下面的示例中，定义了一个名为<code>fullName</code>的访问器，它是对<code>this.firstname</code>和<code>this.lastname</code>两个属性引用，这个属性的一个假属性它并不是数据库中的一部分。定义<code>假属性</code>可以使用访问器或定义为<code>VIRTUAL</code>类型两种方式，<code>Virtual</code>类型可以验证而访问器则不能。</p>
+<pre>var Foo = sequelize.define('foo', {
+  firstname: Sequelize.STRING,
+  lastname: Sequelize.STRING
+}, {
+  getterMethods   : {
+    fullName       : function()  { return this.firstname + ' ' + this.lastname }
+  },
+
+  setterMethods   : {
+    fullName       : function(value) {
+        var names = value.split(' ');
+
+        this.setDataValue('firstname', names.slice(0, -1).join(' '));
+        this.setDataValue('lastname', names.slice(-1).join(' '));
+    },
+  }
+});</pre>
+<p><strong>访问器&设置器内部定义的帮助函数：</strong></p>
+<p>检索底层属性值－总是使用<code>this.getDataValue()</code></p>
+<pre>/* 访问 'title' 的属性 */
+function() {
+    return this.getDataValue('title');
+}</pre>
+<p>设置底层属性值－总是使用<code>this.setDataValue()</code></p>
+<pre>/* 设置 'title' 的属性 */
+function() {
+    return this.setDataValue('title', title.toString().toLowerCase());
+}</pre>
+<p><br /></p>
+<h4 id="definition-validations">1.5 Validations - 验证</h4>
+<p>模型验证，让我们可以模型的每个属性执行验证。</p>
+<p>我们通过模型列属性的<code>validate</code>属性来添加验证，这些验证会在模型实例执行<code>create</code>、<code>update</code>和<code>save</code>自动执行。也可以通过<code>instance.validate()</code>方法，来手工验证模型实例。</p>
+<pre>var ValidateMe = sequelize.define('foo', {
+  foo: {
+    type: Sequelize.STRING,
+    validate: {
+      is: ["^[a-z]+$",'i'],     // 只允许字母
+      is: /^[a-z]+$/i,          // 只允许字母
+      not: ["[a-z]",'i'],       // 不能使用字母
+      isEmail: true,            // 检测邮箱格式 (foo@bar.com)
+      isUrl: true,              // 检查Url格式 (http://foo.com)
+      isIP: true,               // 检查 IPv4 或 IPv6 格式
+      isIPv4: true,             // 检查 IPv4
+      isIPv6: true,             // 检查 IPv6
+      isAlpha: true,            // 不能使用字母
+      isAlphanumeric: true,     // 只允许字母数字字符
+      isNumeric: true,          // 只能使用数字
+      isInt: true,              // 只能是整数
+      isFloat: true,            // 只能是浮点数
+      isDecimal: true,          // 检查数字
+      isLowercase: true,        // 检查小写字母
+      isUppercase: true,        // 检查大写字母
+      notNull: true,            // 不允许null
+      isNull: true,             // 只能为null
+      notEmpty: true,           // 不能空字符串
+      equals: 'specific value', // 只能使用指定值
+      contains: 'foo',          // 必须包含子字符串
+      notIn: [['foo', 'bar']],  // 不能是数组中的任意一个值
+      isIn: [['foo', 'bar']],   // 只能是数组中的任意一个值
+      notContains: 'bar',       // 不能包含子字符串
+      len: [2, 10],              // 值的长度必在 2 和 10 之间
+      isUUID: 4,                // 只能是UUID
+      isDate: true,             // 只能是日期字符串
+      isAfter: "2011-11-05",    // 只能使用指定日期之后的时间
+      isBefore: "2011-11-05",   // 只能使用指定日期之前的时间
+      max: 23,                  // 允许的最大值
+      min: 23,                  // 允许的最小值
+      isArray: true,            // 不能使用数组
+      isCreditCard: true,       // 检查是有效的信用卡
+
+      // 也可以自定义验证:
+      isEven: function(value) {
+        if(parseInt(value) % 2 != 0) {
+          throw new Error('Only even values are allowed!')
+        // we also are in the model's context here, so this.otherField
+        // would get the value of otherField if it existed
+        }
+      }
+    }
+  }
+});</pre>
+<p>验证时可以使用自定义的错误信息代替<code>validator.js</code>的默认信息，只需要在通过对象或数组的方式提供参数即可：</p>
+<pre>isInt: {
+  msg: "Must be an integer number of pennies"
+}</pre>
+<p>或者参数中同样需要提供<code>args</code>属性：</p>
+<pre>isIn: {
+  args: [['en', 'zh']],
+  msg: "Must be English or Chinese"
+}</pre>
+<p><strong>模型验证</strong></p>
+<p><code>Validations</code>同可以用于模型的检测，只需要在字段定义之后定义验证即可。如，在经纬度的应用的我们会需要<code>latitude</code>和<code>longitude</code>都不为空或都为空，这时我们可以像下面这样验证：</p>
+<pre>var Pub = Sequelize.define('pub', {
+  name: { type: Sequelize.STRING },
+  address: { type: Sequelize.STRING },
+  latitude: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+    defaultValue: null,
+    validate: { min: -90, max: 90 }
+  },
+  longitude: {
+    type: Sequelize.INTEGER,
+    allowNull: true,
+    defaultValue: null,
+    validate: { min: -180, max: 180 }
+  },
+}, {
+  validate: {
+    bothCoordsOrNone: function() {
+      if ((this.latitude === null) !== (this.longitude === null)) {
+        throw new Error('Require either both latitude and longitude or neither')
+      }
+    }
+  }
+})</pre>
+<p><br /></p>
+<h4 id="definition-configuration">1.6 Configuration - 配置</h4>
+<p>定义模型时，可以通过配置来设置列名等相关信息：</p>
+<pre>var Bar = sequelize.define('bar', { /* bla */ }, {
+  // 不要添加时间戳属性 (updatedAt, createdAt)
+  timestamps: false,
+
+  // 不从数据库中删除数据，而只是增加一个 deletedAt 标识当前时间
+  // paranoid 属性只在启用 timestamps 时适用
+  paranoid: true,
+
+  // 不使用驼峰式命令规则，这样会在使用下划线分隔
+  // 这样 updatedAt 的字段名会是 updated_at
+  underscored: true,
+
+  // 禁止修改表名. 默认情况下
+  // sequelize会自动使用传入的模型名（define的第一个参数）做为表名
+  // 如果你不想使用这种方式你需要进行以下设置
+  freezeTableName: true,
+
+  // 定义表名
+  tableName: 'my_very_custom_table_name'
+})</pre>
+<p>如果你想sequelize处理时间戳，但只在个别情况下使用，那么你可以对使用的列单独重载：</p>
+<pre>var Foo = sequelize.define('foo',  { /* bla */ }, {
+  // 不要忘了启用 timestamps
+  timestamps: true,
+
+  // 不想使用 createdAt
+  createdAt: false,
+
+  // 想 updatedAt 的实际名为 'updateTimestamp'
+  updatedAt: 'updateTimestamp'
+
+  // 要将 deletedAt 设置为 destroyTime (注意要启用paranoid)
+  deletedAt: 'destroyTime',
+  paranoid: true
+})</pre>
+<p>配置时，也可以修改数据库引擎。如，将默认的InnoDB修改为MyISAM：</p>
+<pre>var Person = sequelize.define('person', { /* attributes */ }, {
+  engine: 'MYISAM'
+})
+
+// or globally
+var sequelize = new Sequelize(db, user, pw, {
+  define: { engine: 'MYISAM' }
+})</pre>
+<p>或者指定一个表描述（MySql和PG中）：</p>
+<pre>var Person = sequelize.define('person', { /* attributes */ }, {
+  comment: "I'm a table comment!"
+})</pre>
+<p><em>注意：</em>字段<code>attributes</code>同样可以添加<code>comment</code>属性，但出于兼容性考虑自<code>sequelize V1.7+</code>起已不再将此属性同步到数据库中，但为字段添加这个属性依然是增加可读性的不错的方式。</p>
+<p><br /></p>
+<h4 id="definition-import">1.7 Import - 模型导入</h4>
+<p>我们可以将模型定义为一个单独的文件，并通过<code> </code>导入。通过文件导入返回的对象与通过<code>defined</code>方法定义的模型完全一致，两者都是<code>instance</code>模型实例。自<code>v1.5.0</code>起，sequlize会对导入进行缓存，这样就不用担心多次对文件修改造成的一些问题。</p>
+<p>如，我们在<code>project.js</code>文件中定义一个名为<code>project</code>的模型：</p>
+<pre>// 这个文件定义于 /path/to/models/project.js
+module.exports = function(sequelize, DataTypes) {
+  return sequelize.define("project", {
+    name: DataTypes.STRING,
+    description: DataTypes.TEXT
+  })
+}</pre>
+<p>我们可以<code>app.js</code>或其它需要的地方引入定义的模型：</p>
+<pre>var Project = sequelize.import(__dirname + "/path/to/models/project")</pre>
+<p><code>import</code>同样可以使用回调函数参数的使用方式：</p>
+<pre>sequelize.import('project', function(sequelize, DataTypes) {
+  return sequelize.define("project", {
+    name: DataTypes.STRING,
+    description: DataTypes.TEXT
+  })
+})</pre>
+<p><br /></p>
+<h4 id="definition-sync">1.8 Database synchronization - 数据库同步</h4>
+<p>开始一个新项目时，我们并没有数据库结构，使用<code>Sequelize</code>时，并不需要先定义好数据库结构。我们只要定义好模型，然后进行同步即可。</p>
+<p><code>Sequelize</code>支持创建表和删除表：</p>
+<pre>// 通过 sync 方法同步数据结构
+// 即,创建表
+Project.sync()
+Task.sync()
+
+// 强制创建
+// 通过设置 force 属性会首先删除表并重新创建
+Project.sync({force: true})
+
+// 删除表
+Project.drop()
+Task.drop()
+
+// 事件处理
+Project.[sync|drop]().then(function() {
+  // 处理成功
+}).catch(function(error) {
+  // 出了点问题^~^
+})</pre>
+<p><code>.sync({ force: true })</code>会删除并重建表，这时我们可以添加<code>match</code>选项，只重建正则表达式匹配的表：</p>
+<pre>sequelize.sync({ force: true, match: /_test$/ });</pre>
+<p><br /></p>
+<h4 id="definition-expansion">1.9 Expansion of models - 模型扩展</h4>
+<p>开始一个新项目时，我们并没有数据库结构，使用<code>Sequelize</code>时，并不需要先定义好数据库结构。我们只要定义好模型，然后进行同步即可。</p>
+<p><br /></p>
+<p><strong>自定义方法</strong></p>
+<p><code>Sequelize</code>允许我们为实例添加自定义方法，可以像下面这样定义：</p>
+<pre>var Foo = sequelize.define('foo', { /* attributes */}, {
+  classMethods: {
+    method1: function(){ return 'smth' }
+  },
+  instanceMethods: {
+    method2: function() { return 'foo' }
+  }
+})
+
+// Example:
+Foo.method1()
+Foo.build().method2()</pre>
+<p><strong>虚拟访问器</strong></p>
+<p>也可以设置虚拟访问器：</p>
+<pre>var User = sequelize.define('user', { firstname: Sequelize.STRING, lastname: Sequelize.STRING }, {
+  instanceMethods: {
+    getFullname: function() {
+      return [this.firstname, this.lastname].join(' ')
+    }
+  }
+})
+
+// Example:
+User.build({ firstname: 'foo', lastname: 'bar' }).getFullname() // 'foo bar'</pre>
+<p><strong>全局方法</strong></p>
+<p>还可以定义用于所有模型实例的全局方法：</p>
+<pre>var sequelize = new Sequelize('database', 'username', 'password', {
+  // Other options during the initialization could be here
+  define: {
+    classMethods: {
+      method1: function() {},
+      method2: function() {}
+    },
+    instanceMethods: {
+      method3: function() {}
+    }
+  }
+})
+
+// Example:
+var Foo = sequelize.define('foo', { /* attributes */});
+Foo.method1()
+Foo.method2()
+Foo.build().method3()</pre>
+<p><strong>索引</strong></p>
+<p><code>Sequelize</code>支持添加索引，在模型中定义后，索引会在<code>Model.sync()</code>或<code>sequelize.sync</code>后创建。下面是几种添加索引的方式：</p>
+<pre>sequelize.define('user', {}, {
+  indexes: [
+    // Create a unique index on email
+    {
+      unique: true,
+      fields: ['email']
+    },
+
+    // Creates a gin index on data with the jsonb_path_ops operator
+    {
+      fields: ['data'],
+      using: 'gin',
+      operator: 'jsonb_path_ops'
+    },
+
+    // By default index name will be [table]_[fields]
+    // Creates a multi column partial index
+    {
+      name: 'public_by_author',
+      fields: ['author', 'status'],
+      where: {
+        status: 'public'
+      }
+    },
+
+    // A BTREE index with a ordered field
+    {
+      name: 'title_index',
+      method: 'BTREE',
+      fields: ['author', {attribute: 'title', collate: 'en_US', order: 'DESC', length: 5}]
+    }
+  ]
+})</pre>
+<p><br /></p>
+<h3 id="usage">2. 模型的使用</h3>
+<h4 id="usage-find">2.1 Data retrieval / Finders - 数据索引/查找</h4>
+<p>查找方法是为了从数据库中查询数据，这些方法不是返回原始数据对象，而是返回模型实例。因会其返回的是模型实例，所以在文档的查询结果中可以任意调用模型实例的成员、方法等。（更多实例介绍请参考：<code>instance</code>）</p>
+<p>下面是一些常用的查询方法。</p>
+<p><strong><code>find</code> - 从数据库中查找一个指定元素</strong></p>
+<pre>// 按已知 id查找
+Project.findById(123).then(function(project) {
+  // project 是一个 Project 实例，且包含存储在数据中的数据
+  // 当不存在 id 为123的记录时 project 为 null
+})
+
+// 按属性查找
+Project.findOne({ where: {title: 'aProject'} }).then(function(project) {
+  // project 是匹配到的第一个 title 为 'aProject' 的 Projects 或 null
+})
+
+
+Project.findOne({
+  where: {title: 'aProject'},
+  attributes: ['id', ['name', 'title']]
+}).then(function(project) {
+  // project 是匹配到的第一个 title 为 'aProject' 的 Projects 或 null
+  // project 的 project.title 属性中会包含 'name'
+})</pre>
+<p><strong><code>findOrCreate</code> - 从数据库中查找一个指定元素如果不存在则创建记录</strong></p>
+<p><code>findOrCreate</code>可用于检测一个不确定是否存在的元素，如果存在则返回记录，不存在时会使用提供的默认值新建记录。</p>
+<p>如，当数据不存在时，其执行效果如下：</p>
+<pre>User
+  .findOrCreate({where: {username: 'itbilu.com'}, defaults: {job: 'Technical Lead JavaScript'}})
+  .spread(function(user, created) {
+    console.log(user.get({
+      plain: true
+    }))
+    console.log(created)
+
+    /*
+      {
+        username: 'itbilu.com',
+        job: 'Technical Lead JavaScript',
+        id: 1,
+        createdAt: Fri Mar 22 2013 21: 28: 34 GMT + 0100(CET),
+        updatedAt: Fri Mar 22 2013 21: 28: 34 GMT + 0100(CET)
+      }
+      created: true
+    */
+  })</pre>
+<p>当数据存在时，会返回记录：</p>
+<pre>User
+  .create({ username: 'fnord', job: 'omnomnom' })
+  .then(function() {
+    User
+      .findOrCreate({where: {username: 'fnord'}, defaults: {job: 'something else'}})
+      .spread(function(user, created) {
+        console.log(user.get({
+          plain: true
+        }))
+        console.log(created)
+
+        /*
+          {
+            username: 'fnord',
+            job: 'omnomnom',
+            id: 2,
+            createdAt: Fri Mar 22 2013 21: 28: 34 GMT + 0100(CET),
+            updatedAt: Fri Mar 22 2013 21: 28: 34 GMT + 0100(CET)
+          }
+          created: false
+        */
+      })
+  })</pre>
+<p><strong><code>findAndCountAll</code> - 从数据库中查找多个元素，返回数据与记录总数</strong></p>
+<p>这个方法是<code>findAll</code>和<code>count</code>两个方法的便捷形式，这在你想使用<code>limit</code>和<code>offset</code>进行分页查询时非常有用。</p>
+<p>在返回值中，会包含以下两个属性：</p>
+<ul>
+<li><code>count</code> - 整数，匹配到的总记录数</li>
+<li><code>rows</code> - 对象数据，通过 limit 和 offset匹配的当前页数据</li>
+</ul>
+<pre>Project
+  .findAndCountAll({
+     where: {
+        title: {
+          $like: 'foo%'
+        }
+     },
+     offset: 10,
+     limit: 2
+  })
+  .then(function(result) {
+    console.log(result.count);
+    console.log(result.rows);
+  });</pre>
+<p><code>findAndCountAll</code>同样支持使用<code>include</code>包含，使用包含时只有将<code>required</code>设置为true才会添加到<code>count</code>部分：</p>
+<pre>User.findAndCountAll({
+  include: [
+     { model: Profile, required: true}
+  ],
+  limit: 3
+});</pre>
+<p>使用<code>include</code>时，两个模型之间应该存在主/外键关系，如果不存在就应该在<code>include</code>中手工建立连接。</p>
+<p>在上面的示例中，为<code>Profile</code>设置了<code>required</code>，所以在查询时会使用<code>INNER JOIN</code>内连接。</p>
+<p><strong><code>findAll</code> - 从数据库中查找多个元素</strong></p>
+<p><code>findAndCountAll</code>中使用的查询选项同样适用于<code>findAll</code>方法。</p>
+<pre>// 查询多条记录
+Project.findAll().then(function(projects) {
+  // projects 是一个包含Project实例的数组
+})
+
+// 同样的，all是findAll的别名方法:
+Project.all().then(function(projects) {
+  // projects 是一个包含Project实例的数组
+})
+
+// 通过指定属性查找
+Project.findAll({ where: { name: 'A Project' } }).then(function(projects) {
+// projects 是一个包含 Project 实例的数组
+})
+
+// 查询时使用字符串替换
+Project.findAll({ where: ["id > ?", 25] }).then(function(projects) {
+  // projects 是一个包含 Project 实例的数组，各实例的id 大于25
+})
+
+// 查询指定范围
+Project.findAll({ where: { id: [1,2,3] } }).then(function(projects) {
+  // projects 是一个包含 Project 实例的数组，各实例id 是1, 2, 或 3
+  // 这在实例执行时，会使用 IN查询
+})
+
+Project.findAll({
+  where: {
+    id: {
+      $and: {a: 5}           // AND (a = 5)
+      $or: [{a: 5}, {a: 6}]  // (a = 5 OR a = 6)
+      $gt: 6,                // id > 6
+      $gte: 6,               // id >= 6
+      $lt: 10,               // id < 10
+      $lte: 10,              // id <= 10
+      $ne: 20,               // id != 20
+      $between: [6, 10],     // BETWEEN 6 AND 10
+      $notBetween: [11, 15], // NOT BETWEEN 11 AND 15
+      $in: [1, 2],           // IN [1, 2]
+      $notIn: [1, 2],        // NOT IN [1, 2]
+      $like: '%hat',         // LIKE '%hat'
+      $notLike: '%hat'       // NOT LIKE '%hat'
+      $iLike: '%hat'         // ILIKE '%hat' (case insensitive)  (PG only)
+      $notILike: '%hat'      // NOT ILIKE '%hat'  (PG only)
+      $overlap: [1, 2]       // && [1, 2] (PG array overlap operator)
+      $contains: [1, 2]      // @> [1, 2] (PG array contains operator)
+      $contained: [1, 2]     // <@ [1, 2] (PG array contained by operator)
+      $any: [2,3]            // ANY ARRAY[2, 3]::INTEGER (PG only)
+    },
+    status: {
+      $not: false,           // status NOT FALSE
+    }
+  }
+})</pre>
+<p><strong>IN/OR 等复合筛选</strong></p>
+<p>如果要在查询中使用<code>AND</code>、<code>OR</code>或<code>DOT</code>等筛选条件，可以查询的<code>where</code>中指定<code>$and</code>、<code>$or</code>或<code>$not</code>等属性：</p>
+<pre>Project.findOne({
+  where: {
+    name: 'a project',
+    $or: [
+      { id: [1,2,3] },
+      { id: { $gt: 10 } }
+    ]
+  }
+})
+
+Project.findOne({
+  where: {
+    name: 'a project',
+    id: {
+      $or: [
+        [1,2,3],
+        { $gt: 10 }
+      ]
+    }
+  }
+})</pre>
+<p>这个查询生成的实际SQL语句为：</p>
+<pre>SELECT *
+FROM `Projects`
+WHERE (
+  `Projects`.`name` = 'a project'
+   AND (`Projects`.`id` IN (1,2,3) OR `Projects`.`id` > 10)
+)
+LIMIT 1;</pre>
+<p><code>$not</code>示例：</p>
+<pre>Project.findOne({
+  where: {
+    name: 'a project',
+    $not: [
+      { id: [1,2,3] },
+      { array: { $contains: [3,4,5] } }
+    ]
+  }
+});</pre>
+<p>将生成以下语句：</p>
+<pre>SELECT *
+FROM `Projects`
+WHERE (
+  `Projects`.`name` = 'a project'
+   AND NOT (`Projects`.`id` IN (1,2,3) OR `Projects`.`array` @> ARRAY[1,2,3]::INTEGER[])
+)
+LIMIT 1;</pre>
+<p><strong>对数据集使用<code>limit</code>、<code>offset</code>、<code>order</code> 和 <code>group</code></strong></p>
+<pre>// 使用 limit 限制返回结果数
+Project.findAll({ limit: 10 })
+
+// 跳过前 10 条结果
+Project.findAll({ offset: 10 })
+
+// 跳过前 10 条结果后，返回两条数据
+Project.findAll({ offset: 10, limit: 2 })</pre>
+<p>分组与排序的语法是相似的，如下：</p>
+<pre>Project.findAll({order: 'title DESC'})
+// ORDER BY title DESC
+
+Project.findAll({group: 'name'})
+// GROUP BY name</pre>
+<p>传入简单的字符串时，查询字符串会逐字查询，即列名不转义。如果需要列名转义，可以提供一个数组参数。</p>
+<pre>something.findOne({
+  order: [
+    'name',
+    // will return `name`
+    'username DESC',
+    // will return `username DESC` -- i.e. don't do it!
+    ['username', 'DESC'],
+    // will return `username` DESC
+    sequelize.fn('max', sequelize.col('age')),
+    // will return max(`age`)
+    [sequelize.fn('max', sequelize.col('age')), 'DESC'],
+    // will return max(`age`) DESC
+    [sequelize.fn('otherfunction', sequelize.col('col1'), 12, 'lalala'), 'DESC'],
+    // will return otherfunction(`col1`, 12, 'lalala') DESC
+    [sequelize.fn('otherfunction', sequelize.fn('awesomefunction', sequelize.col('col'))), 'DESC']
+    // will return otherfunction(awesomefunction(`col`)) DESC, This nesting is potentially infinite!
+    [{ raw: 'otherfunction(awesomefunction(`col`))' }, 'DESC']
+    // This won't be quoted, but direction will be added
+  ]
+})</pre>
+<p>更多关于聚合查询，请参考：<a href="http://itbilu.com/nodejs/npm/EJcKjQWfM.html" target="_blank">在Sequelize中使用group by分组聚合查询</a></p>
+<p><strong>原始查询</strong></p>
+<p>默情况下，Sequlize人为查询结构创建实例，通过这个实例可以进行数据的更新、删除等操作。有时候我只需要显示数据集，而不需要进行处理，这时可以通过设置<code>raw</code>选项来返回原始数据：</p>
+<pre>// 增加 raw 选项后，会返回数据库中的原始结果
+Project.findAll({ where: { ... }, raw: true })</pre>
+<p><strong><code>count</code> - 统计数据库中的元素数</strong></p>
+<p><code>count</code>可以统计数据库中的元素数：</p>
+<pre>Project.count().then(function(c) {
+  console.log("There are " + c + " projects!")
+})
+
+Project.count({ where: ["id > ?", 25] }).then(function(c) {
+  console.log("There are " + c + " projects with an id greater than 25.")
+})</pre>
+<p><strong><code>max</code> - 查找指定表中最大值</strong></p>
+<pre>// 数据库中有3条记录，年龄分别是 10, 5, 40
+Project.max('age').then(function(max) {
+  // 会返回 40
+})
+
+Project.max('age', { where: { age: { lt: 20 } } }).then(function(max) {
+  // 会返回 10
+})</pre>
+<p><strong><code>min</code> - 查找指定表中最小值</strong></p>
+<pre>// 数据库中有3条记录，年龄分别是 10, 5, 40
+Project.min('age').then(function(min) {
+  // 会返回 5
+})
+
+Project.min('age', { where: { age: { $gt: 5 } } }).then(function(min) {
+  // 会返回 10
+})</pre>
+<p><strong><code>sum</code> - 对指定属性求和</strong></p>
+<pre>// 数据库中有3条记录，年龄分别是 10, 5, 40
+Project.sum('age').then(function(sum) {
+  // 会返回 55
+})
+
+Project.sum('age', { where: { age: { $gt: 5 } } }).then(function(sum) {
+  // 会返回 50
+})
+</pre>
+<p><br /></p>
+<h4 id="usage-eager-loading">2.2 Eager loading - 预加载</h4>
+<p>从数据库中加载数据时，除数据本身外还想得到与之相关联的数据－这就是所谓的预加载。也就是说，使用<code>find</code>或<code>findAll</code>查询数据时，通过<code>include</code>属性同时加载关联的数据。</p>
+<p>假设有以下数据结构：</p>
+<pre>var User = sequelize.define('user', { name: Sequelize.STRING })
+  , Task = sequelize.define('task', { name: Sequelize.STRING })
+  , Tool = sequelize.define('tool', { name: Sequelize.STRING })
+
+Task.belongsTo(User)
+User.hasMany(Task)
+User.hasMany(Tool, { as: 'Instruments' })
+
+sequelize.sync().then(function() {
+  // this is where we continue ...
+})</pre>
+<p>通过<code>belongsTo</code>与<code>hasMany</code>建立关系后，就可以像下面这样查询：</p>
+<pre>Task.findAll({ include: [ User ] }).then(function(tasks) {
+  console.log(JSON.stringify(tasks))
+
+  /*
+    [{
+      "name": "A Task",
+      "id": 1,
+      "createdAt": "2013-03-20T20:31:40.000Z",
+      "updatedAt": "2013-03-20T20:31:40.000Z",
+      "userId": 1,
+      "user": {
+        "name": "John Doe",
+        "id": 1,
+        "createdAt": "2013-03-20T20:31:45.000Z",
+        "updatedAt": "2013-03-20T20:31:45.000Z"
+      }
+    }]
+  */
+})</pre>
+<p>由于<code>Task</code>与<code>User</code>是<em>1对多</em>的关系，所在以查询时<code>user</code>会做为一个对象属性被同时加载。</p>
+<p>下面我们进行一个<em>多对多</em>的查询：</p>
+<pre>User.findAll({ include: [ Task ] }).then(function(users) {
+  console.log(JSON.stringify(users))
+
+  /*
+    [{
+      "name": "John Doe",
+      "id": 1,
+      "createdAt": "2013-03-20T20:31:45.000Z",
+      "updatedAt": "2013-03-20T20:31:45.000Z",
+      "tasks": [{
+        "name": "A Task",
+        "id": 1,
+        "createdAt": "2013-03-20T20:31:40.000Z",
+        "updatedAt": "2013-03-20T20:31:40.000Z",
+        "userId": 1
+      }]
+    }]
+  */
+})</pre>
+<p>在<em>多对多</em>的关系中，相关数据会做为一个数组属性被同时加载。</p>
+<p>关联查询时，可以使用<code>as</code>选项为关系数据指定别名：</p>
+<pre>User.findAll({ include: [{ model: Tool, as: 'Instruments' }] }).then(function(users) {
+  console.log(JSON.stringify(users))
+
+  /*
+    [{
+      "name": "John Doe",
+      "id": 1,
+      "createdAt": "2013-03-20T20:31:45.000Z",
+      "updatedAt": "2013-03-20T20:31:45.000Z",
+      "Instruments": [{
+        "name": "Toothpick",
+        "id": 1,
+        "createdAt": null,
+        "updatedAt": null,
+        "userId": 1
+      }]
+    }]
+  */
+})</pre>
+<p>关联查询时，同样可以使用<code>where</code>选项对关联数据进行筛选：</p>
+<pre>User.findAll({
+    include: [{
+        model: Tool,
+        as: 'Instruments',
+        where: { name: { $like: '%ooth%' } }
+    }]
+}).then(function(users) {
+    console.log(JSON.stringify(users))
+
+    /*
+      [{
+        "name": "John Doe",
+        "id": 1,
+        "createdAt": "2013-03-20T20:31:45.000Z",
+        "updatedAt": "2013-03-20T20:31:45.000Z",
+        "Instruments": [{
+          "name": "Toothpick",
+          "id": 1,
+          "createdAt": null,
+          "updatedAt": null,
+          "userId": 1
+        }]
+      }],
+
+      [{
+        "name": "John Smith",
+        "id": 2,
+        "createdAt": "2013-03-20T20:31:45.000Z",
+        "updatedAt": "2013-03-20T20:31:45.000Z",
+        "Instruments": [{
+          "name": "Toothpick",
+          "id": 1,
+          "createdAt": null,
+          "updatedAt": null,
+          "userId": 1
+        }]
+      }],
+    */
+  })</pre>
+<p><em>注意：</em>使用<code>include.where</code>条件时，<code>include.requied</code>会被隐式的设置为<code>true</code>，即在查询时会使用<code>INNER JOIN</code>内连接。</p>
+<p><strong>全关联</strong></p>
+<p>如果多个模型间存在关联关系，而我们在查询时又要查询所有的数据，就可以设置<code>all: true</code>来关联所有模型：</p>
+<pre>User.findAll({ include: [{ all: true }]});</pre>
+<p><strong>包括软删除的数据</strong></p>
+<p>如果要在结果中包含软删除的数据，请将<code>include.paranoid</code>设置为<code>true</code>：</p>
+<pre>User.findAll({
+    include: [{
+        model: Tool,
+        where: { name: { $like: '%ooth%' } },
+        paranoid: true // 查询并加载软删除的数据
+    }]
+});</pre>
+<p><strong>预加载关联数据的排序</strong></p>
+<p>在<em>1对多</em>（one-to-many）的关系中：</p>
+<pre>Company.findAll({ include: [ Division ], order: [ [ Division, 'name' ] ] });
+Company.findAll({ include: [ Division ], order: [ [ Division, 'name', 'DESC' ] ] });
+Company.findAll({
+  include: [ { model: Division, as: 'Div' } ],
+  order: [ [ { model: Division, as: 'Div' }, 'name' ] ]
+});
+Company.findAll({
+  include: [ { model: Division, as: 'Div' } ],
+  order: [ [ { model: Division, as: 'Div' }, 'name', 'DESC' ] ]
+});
+Company.findAll({
+  include: [ { model: Division, include: [ Department ] } ],
+  order: [ [ Division, Department, 'name' ] ]
+});</pre>
+<p>在<em>多对多</em>（many-to-many）的关系中同样可以使用排序：</p>
+<pre>Company.findAll({
+  include: [ { model: Division, include: [ Department ] } ],
+  order: [ [ Division, DepartmentDivision, 'name' ] ]
+});</pre>
+<p><strong>嵌套预加载</strong></p>
+<p>可以在关联模型中嵌套预加载关系模型：</p>
+<pre>User.findAll({
+  include: [
+    {model: Tool, as: 'Instruments', include: [
+      {model: Teacher, include: [ /* etc */]}
+    ]}
+  ]
+}).then(function(users) {
+  console.log(JSON.stringify(users))
+
+  /*
+    [{
+      "name": "John Doe",
+      "id": 1,
+      "createdAt": "2013-03-20T20:31:45.000Z",
+      "updatedAt": "2013-03-20T20:31:45.000Z",
+      "Instruments": [{ // 1:M and N:M association
+        "name": "Toothpick",
+        "id": 1,
+        "createdAt": null,
+        "updatedAt": null,
+        "userId": 1,
+        "Teacher": { // 1:1 association
+          "name": "Jimi Hendrix"
+        }
+      }]
+    }]
+  */
+})</pre>
+<p>这会生成一个外连接，但<code>where</code>子句的关系模型会使用内连接并返回唯一一个子句：</p>
+<pre>User.findAll({
+  include: [{
+    model: Tool,
+    as: 'Instruments',
+    include: [{
+      model: Teacher,
+      where: {
+        school: "Woodstock Music School"
+      },
+      required: false
+    }]
+  }]
+}).then(function(users) {
+  /* ... */
+})
+</pre>
+<p><code>include</code>同样支持嵌套加载：</p>
+<pre>User.findAll({ include: [{ all: true, nested: true }]});</pre>
+<p><br /></p>
+<h3 id="api">3. <code>Model</code>类的API</h3>
+<p><code>Model</code>相当于数据库中表，有时你也会看到它被称为“模型”、或简单的被为“工厂”。这个类不能显式的（通过构造函数）创建实例，而是应该通过<code>sequelize.define</code>方法来创建，对于已经创建可以通过<code>sequelize.import</code>方法来导入。</p>
+<h4 id="api-removeAttribute">3.1 <code>removeAttribute()</code> - 移除属性</h4>
+<pre>removeAttribute([attribute])</pre>
+<p>从已定义的模型中移除属性</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[attribute]</td>
+<td>String</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>使用示例：</p>
+<pre>let User = sequelize.define('user', {
+  firstName: Sequelize.STRING,
+  lastName: Sequelize.STRING
+});
+
+User.sync().then(function(result){
+  User.create({firstName:'xxxx', lastName:'xxxx'})
+  .then(function(result){
+    User.findOne({raw:true})
+    .then(function(result){
+      console.log(result); // { id: 1, firstName: 'xxxx', lastName: 'xxxx'}
+
+      // 移'firstName'属性
+      User.removeAttribute('firstName');
+      User.findOne({raw:true})
+      .then(function(result){
+        console.log(result);  // // { id: 1, lastName: 'xxxx'}
+      })
+    })  
+  })
+})</pre>
+<p><br /></p>
+<h4 id="api-sync">3.2 <code>sync()</code> - 同步模型到数据库</h4>
+<pre>sync() -> Promise.<this></pre>
+<p>同步<code>Model</code>结构到数据库中，即：在数据库中创建表。执行成功后，会在回调中返回模弄的实例（<code>this</code>）。</p>
+<p><strong>与<code>sequelize.sync</code>的不同</strong></p>
+<p><code>Model.sync()</code>只会同步当前模型到数据库中，而<code>sequelize.sync()</code>会同步<code>sequelize</code>实例中定义所有模型。</p>
+<pre>let User = sequelize.define('user', {
+  firstName: Sequelize.STRING,
+  lastName: Sequelize.STRING
+});
+
+let Role = sequelize.define('role', {
+  roleName: Sequelize.STRING
+});
+
+let UserRole = sequelize.define('userRole', {
+  userId: Sequelize.INTEGER,
+  roleId: Sequelize.STRING
+});
+
+User.sync().then(function(result){
+    // 同步了'User'一个模型
+})
+
+sequelize.sync().then(function(result){
+  // 同步了'Role'、'UserRole'、'UserRole'三个模型
+})</pre>
+<p><strong>相关</strong></p>
+<ul>
+	<li><a href="http://itbilu.com/nodejs/core/VkYIaRPz-.html#api-instance-sync" target="_blank">Sequelize#sync</a></li>
+</ul>
+<p><br /></p>
+<h4 id="api-drop">3.3 <code>drop()</code> - 删除数据库中的表</h4>
+<pre>drop([options]) -> Promise</pre>
+<p>删除<code>Model</code>在数据库中对应的表。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.cascade=false]</td>
+<td>Boolean</td>
+<td>同时移除依赖于该表的对象，如视图。仅 postgres适用</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个函数用于打印查询时的sql</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>在打印日志时同时输出执行SQL花费的时候（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-schema">3.4 <code>schema()</code> - 指定<code>schema</code></h4>
+<pre>schema(schema, [options]) -> this</pre>
+<p>为<code>Model</code>指定<code>schema</code>（数据库）。在postgres中将会设置为<code>"schema"."tableName"</code>，而在mysql和sqlite中将会设置为<code>'schema.tablename'</code></p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>schema</td>
+<td>String</td>
+<td>schema名</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.schemaDelimiter='.']</td>
+<td>String</td>
+<td>schema与表名的分隔符</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个函数用于打印查询时的sql</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>在打印日志时同时输出执行SQL花费的时候（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-getTableName">3.5 <code>getTableName()</code> - 获取表名</h4>
+<pre>getTableName([options]) -> String|Object</pre>
+<p>获取<code>Model</code>在数据库中的表名。在未指定<code>schema</code>时会返回模型名，或返回一个包含<code>tableName</code>、<code>schema</code>和<code>delimiter</code>属性的对象。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>schema</td>
+<td>String</td>
+<td>schema名</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个函数用于打印查询时的sql</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>在打印日志时同时输出执行SQL花费的时候（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-addScope">3.6 <code>addScope()</code> - 添加限制范围</h4>
+<pre>addScope(name, scope, [options])</pre>
+<p>为模型添加一个新的限制范围。在定义模型时如果未指定验证，这一方法会非常有用。</p>
+<p>如果指定的限制已经存在，默认会抛出异常，这时可以传入<code>override: true</code>选项来解决。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>name</td>
+<td>String</td>
+<td>限制范围名。使用<code>defaultScope</code>是，会替换默认的限制</td>
+</tr>
+<tr>
+<td>scope</td>
+<td>Object | Function</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.override=false]</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-scope">3.7 <code>scope()</code> - 应用限制范围</h4>
+<pre>scope(options*) -> Model</pre>
+<p>在应用在<code>define</code>定义模型时创建的作用范围。如，在定义模型时我们会像下面这样创建作用范围：</p>
+<pre>var Model = sequelize.define('model', attributes, {
+  defaultScope: {
+    where: {
+      username: 'dan'
+    },
+    limit: 12
+  },
+  scopes: {
+    isALie: {
+      where: {
+        stuff: 'cake'
+      }
+    },
+    complexFunction: function(email, accessLevel) {
+      return {
+        where: {
+          email: {
+            $like: email
+          },
+          accesss_level {
+            $gte: accessLevel
+          }
+        }
+      }
+    }
+  }
+})</pre>
+<p>定义默认的限制范围后，默认限制会在每次查询时起作用：</p>
+<pre>Model.findAll() // WHERE username = 'dan'
+Model.findAll({ where: { age: { gt: 12 } } }) // WHERE age > 12 AND username = 'dan'</pre>
+<p>我们可以通过<code>scope()</code>像下面这样应用限制范围：</p>
+<pre>Model.scope({ method: ['complexFunction' 'dan@sequelize.com', 42]}).findAll()
+// WHERE email like 'dan@sequelize.com%' AND access_level >= 42</pre>
+<p><br /></p>
+<h4 id="api-findAll">3.8 <code>findAll()</code> - 查询多条数据</h4>
+<pre>findAll([options]) -> Promise.&lt;Array.&lt;Instance&gt;&gt;</pre>
+<p>查询多个实例（多条数据）。</p>
+<p>如，在查询中使用<code>AND</code>和<code>=</code>：</p>
+<pre>Model.findAll({
+  where: {
+    attr1: 42,
+    attr2: 'cake'
+  }
+})
+// WHERE attr1 = 42 AND attr2 = 'cake'</pre>
+<p>在查询中使用<code>大于</code>、<code>小于</code>等：</p>
+<pre>
+Model.findAll({
+  where: {
+    attr1: {
+      $gt: 50
+    },
+    attr2: {
+      $lte: 45
+    },
+    attr3: {
+      $in: [1,2,3]
+    },
+    attr4: {
+      $ne: 5
+    }
+  }
+})
+// WHERE attr1 > 50 AND attr2 <= 45 AND attr3 IN (1,2,3) AND attr4 != 5</pre>
+<p>在查询中使用<code>OR</code>：</p>
+<pre>Model.findAll({
+  where: {
+    name: 'a project',
+    $or: [
+      {id: [1, 2, 3]},
+      {
+        $and: [
+          {id: {gt: 10}},
+          {id: {lt: 100}}
+        ]
+      }
+    ]
+  }
+});
+
+//WHERE `Model`.`name` = 'a project' AND (`Model`.`id` IN (1, 2, 3) OR (`Model`.`id` > 10 AND `Model`.`id` < 100));</pre>
+<p>查询成功后会返回包含多个实例（<code>instance</code>）的数组。</p>
+<p><strong>别名：<code>all</code></strong></p>
+<p><strong>相关</strong></p>
+<ul>
+	<li><a href="http://itbilu.com/nodejs/core/VkYIaRPz-.html#api-instance-query" target="_blank">Sequelize#query
+</a></li>
+</ul>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.where]</td>
+<td>Object</td>
+<td>一个描述查询限制范围（<code>WHERE</code>条件）的对象</td>
+</tr>
+<tr>
+<td>[options.attributes]</td>
+<td>Array.&lt;String&gt; | Object</td>
+<td>要查询的属性（字段）列表，或一个<code>include</code> 和 <code>exclude</code> 对象的键。<br/>要对属性进行重命名，可以传入一个包含两个元素的数组－第一个表示属性在数据库中的名称或（或一些类似<code>Sequelize.literal</code>, <code>Sequelize.fn</code>等的表达式），第二个属性表示要在返回实例中使用的名称</td>
+</tr>
+<tr>
+<td>[options.attributes.include]</td>
+<td>Array.&lt;String&gt;</td>
+<td>选择所有模型属性并添加一些附加值，用于聚合计算。如：<br/><code>{attributes:{ <br/>include:[[sequelize.fn('COUNT', sequelize.col('id')),'total']]}</code></td>
+</tr>
+<tr>
+<td>[options.attributes.exclude]</td>
+<td>Array.&lt;String&gt;</td>
+<td>选择模型中除少数属性外的所有属性，这主要出于安全目录。
+如：<br/><code>{ attributes: { exclude: ['password'] } }</code></td>
+</tr>
+<tr>
+<td>[options.paranoid=true]</td>
+<td>Boolean</td>
+<td>为<code>true</code>时，只会未删除的记录会返回，否则会返回删除和未删除的全部记录</td>
+</tr>
+<tr>
+<td>[options.include]</td>
+<td>Array.&lt;Object | Model&gt;</td>
+<td>一个用于左连接的连接列表，<br/>
+支持<code>{ include: [ Model1, Model2, ...]}</code> 或 <code>{ include: [{ model: Model1, as: 'Alias' }]}</code>的形式<br/>如果你的连接要设置<code>as</code> (如 <code>X.hasMany(Y, { as: 'Z }</code>, 你需要将要加载的 Y 的as属性指定为Z)</td>
+</tr>
+<tr>
+<td>[options.include[].model]</td>
+<td>Model</td>
+<td>你想要加载的模型</td>
+</tr>
+<tr>
+<td>[options.include[].as]</td>
+<td>String</td>
+<td>别名关系，如果你想对要加载的模型起别名。<br/>对于 <code>hasOne</code> / <code>belongsTo</code>, 这地应该使用单数形式名，而对于<code>hasMany</code>则应该使用复数形式名</td>
+</tr>
+<tr>
+<td>[options.include[]<br/>.association]</td>
+<td>Association</td>
+<td>想要加载的关系(这可以用来替代提供的一个model/as对)</td>
+</tr>
+<tr>
+<td>[options.include[].where]</td>
+<td>Object</td>
+<td>用于子模型的<code>WHERE</code>分句。注意，这会对要加载的使用内连接，除非显示指定<code>required: false</code></td>
+</tr>
+<tr>
+<td>[options.include[].or=false]</td>
+<td>Boolean</td>
+<td>是否将 ON 和 WHERE 分名与 OR绑定在一起而不是替换 AND</td>
+</tr>
+<tr>
+<td>[options.include[].on]</td>
+<td>Object</td>
+<td>为连接提供你的 ON 条件</td>
+</tr>
+<tr>
+<td>[options.include[].attributes]</td>
+<td>Array.&lt;String&gt;</td>
+<td>要从子模型中查询的属性列表</td>
+</tr>
+<tr>
+<td>[options.include[].required]</td>
+<td>Boolean</td>
+<td>如果为<code>true</code>，会转换为内连接。这意味着，只有匹配到子模型的父模型才会被加载。<code>include.where</code>设置后为True，其它情况 false</td>
+</tr>
+<tr>
+<td>[options.include[].separate]</td>
+<td>Boolean</td>
+<td>如果为<code>true</code>，运行一个单独的查询来获取关联的实例，仅支持<code>hasMany</code>关系</td>
+</tr>
+<tr>
+<td>[options.include[].limit]</td>
+<td>Number</td>
+<td>限制连接的行数，仅在<code>include.separate=true</code>时支持</td>
+</tr>
+<tr>
+<td>[options.include[]<br/>.through.where]</td>
+<td>Object</td>
+<td>为 belongsToMany 关系，过滤连接的模型</td>
+</tr>
+<tr>
+<td>[options.include[]<br/>.through.attributes]</td>
+<td>Array</td>
+<td>在 belongsToMany 关系中，连接模型选择的属性列表</td>
+</tr>
+<tr>
+<td>[options.include[].include]</td>
+<td>Array.&lt;Object | Model&gt;</td>
+<td>进一步嵌套相关模型</td>
+</tr>
+<tr>
+<td>[options.order]</td>
+<td>String | Array | Sequelize.fn</td>
+<td>指定一个排序. 如果是字符串，那么会进行编码。<br/>如果是数组，那么可以依次提供多组<code>列名/排序函数</code>，每一组包含两个元素，第一个是排序字段名，第二个是排序方式，如: <code>order: [['name', 'DESC']]</code>。这种情况下，列名会进行编码而排序方向不会</td>
+</tr>
+<tr>
+<td>[options.limit]</td>
+<td>Number</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.offset]</td>
+<td>Number</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options.lock]</td>
+<td>String | Object</td>
+<td>锁定已选行. 可选项有: transaction.LOCK.UPDATE、  transaction.LOCK.SHARE，<br/>Postgres还支持: supports transaction.LOCK.KEY_SHARE、  transaction.LOCK.NO_KEY_UPDATE 和指定模型的连接锁<br/>详见 <a href="http://itbilu.com/nodejs/npm/EJO6CcCM-.html#option-lock" target="_blank">transaction.LOCK</a></td>
+</tr>
+<tr>
+<td>[options.raw]</td>
+<td>Boolean</td>
+<td>返回原始结果. 详见 <a href="http://itbilu.com/nodejs/core/VkYIaRPz-.html#api-instance-query" target="_blank">sequelize.query</a></td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个用于打印执行SQL语句的函数</td>
+</tr>
+<tr>
+<td>[options.having]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options<br>.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>一个用于指定 schema 的 search_path 的可选项(仅 Postgres 适用)</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>打印执行SQL语句时，同时输出执行时间（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-findById">3.9 <code>findById()</code> - 通过Id查询单条数据</h4>
+<pre>findById(id, [options]) -> Promise.&lt;Instance&gt;</pre>
+<p>通过Id（主键）查询单个实例（单条数据）。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>Number | String | Buffer</td>
+<td>要查询实例的主键</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options<br>.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>指定schema的 search_path (仅 Postgres)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>别名：<code>findByPrimary</code></strong></p>
+<p><br /></p>
+<h4 id="api-findOne">3.10 <code>findOne()</code> - 通过单条数据</h4>
+<pre>findById(id, [options]) -> Promise.&lt;Instance&gt;</pre>
+<p>查询单个实例（单条数据）。这将会使用<code>LIMIT 1</code>查询条件，所以回调中总是返回单个实例。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>指定schema的 search_path (仅 Postgres)</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-aggregate">3.11 <code>aggregate()</code> - 聚合查询</h4>
+<pre>aggregate(field, aggregateFunction, [options]) -> Promise.&lt;options.dataType|object&gt;</pre>
+<p>在指定字段<code>field</code>上运行聚合查询。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>field</td>
+<td>String</td>
+<td>要运行聚合的字段。可以是字段名或<code>*</code></td>
+</tr>
+<tr>
+<td>aggregateFunction</td>
+<td>String</td>
+<td>聚合函数，如<code>sum</code>, <code>max</code>etc.</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td>查询选项，可通过<code>sequelize.query</code>查看所有选项</td>
+</tr>
+<tr>
+<td>[options.where]</td>
+<td>Object</td>
+<td>查询属性</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个用于打印查询时所执行sql的函数</td>
+</tr>
+<tr>
+<td>[options.dataType]</td>
+<td>DataType | String</td>
+<td>结果类型。如<code>field</code>是模型中的字段，默认为字段的类型，其它情况为默认为 float</td>
+</tr>
+<tr>
+<td>[options.distinct]</td>
+<td>boolean</td>
+<td>为字段使用<code>DISTINCT</code>聚合查询</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中运行查询</td>
+</tr>
+<tr>
+<td>[options.plain]</td>
+<td>Boolean</td>
+<td>当为<code>true</code>时，第一个<code>aggregateFunction</code>的返回值为<code>dataType</code>指定和返回，如果添加了额外的属性，则由<code>group</code>分句决定。设置<code>plain</code> 为 <code>false</code> 时会返回所有返回行中的所有值 。默认为 <code>true</code></td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>当打印SQL日志时同时输出查询执行时间（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-count">3.12 <code>count()</code> - 统计查询结果数</h4>
+<pre>count([options]) -> Promise.&lt;Integer&gt;</pre>
+<p>统计符合查询条件的结果总数。</p>
+<p>如果提供了<code>include</code>，将计算匹配关联的数目</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.where]</td>
+<td>Object</td>
+<td>查询属性（条件）</td>
+</tr>
+<tr>
+<td>[options.include]</td>
+<td>Object</td>
+<td>Include 选项</td>
+</tr>
+<tr>
+<td>[options.distinct]</td>
+<td>boolean</td>
+<td>在主键上使用 COUNT(DISTINCT(col)), <code>Model.aggregate</code> 要使用其它列</td>
+</tr>
+<tr>
+<td>[options.attributes]</td>
+<td>Object</td>
+<td>在 <code>group</code>中联合使用</td>
+</tr>
+<tr>
+<td>[options.group]</td>
+<td>Object</td>
+<td>创建复杂统计时，会返回所需要的多行</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询Transaction to run query under</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个用于打印查询时所执行sql的函数</td>
+</tr>
+<tr>
+<td>[options<br/>.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>指定schema的 search_path (仅 Postgres)</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>当打印SQL日志时同时输出查询执行时间（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-findAndCount">3.13 <code>findAndCount()</code> - 分页查询</h4>
+<pre>findAndCount([findOptions]) -> Promise.&lt;Object&gt;</pre>
+<p>查询由<code>offset/limit</code>指定的所有匹配行，并返回查询条件所匹配的总数量。</p>
+<pre>Model.findAndCountAll({
+  where: ...,
+  limit: 12,
+  offset: 12
+}).then(function (result) {
+  ...
+})</pre>
+<p>在上面查询中，<code>result</code>是一个包含以两个属性的对象：</p>
+<pre>{
+  rows: [<row>],
+  count: <Integer>
+}</pre>
+<p><code>result.rows</code>是匹配的查询行，<code>result.count</code>是查询条件匹配的总数量。</p>
+<p>如果提供了<code>include</code>，将计算匹配关联的数目</p>
+<pre>User.findAndCountAll({
+  include: [
+     { model: Profile, required: true}
+  ],
+  limit 3
+});</pre>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[findOptions]</td>
+<td>Object</td>
+<td>参见 findAll</td>
+</tr>
+</tbody>
+</table>
+<p><strong>别名：<code>findAndCountAll</code></strong></p>
+<p><br /></p>
+<h4 id="api-max">3.14 <code>max()</code> - 查询最大值</h4>
+<pre>max(field, [options]) -> Promise.&lt;Any&gt;</pre>
+<p>查询指定字段的最大值</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>field</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td>参见 Object</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-min">3.15 <code>min()</code> - 查询最大值</h4>
+<pre>min(field, [options]) -> Promise.<Any></pre>
+<p>查询指定字段的最小值</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>field</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td>参见 Object</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-sum">3.16 <code>sum()</code> - 求和</h4>
+<pre>sum(field, [options]) -> Promise.&lt;Number&gt;</pre>
+<p>对指定字段求和</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>field</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td>参见 Object</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-build">3.17 <code>build()</code> - 创建新实例</h4>
+<pre>build(values, [options]) -> Instance</pre>
+<p>创建一个新的模型实例，<code>Values</code>参数为新例指定的键值对对象</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>values</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.raw=false]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>时，值会忽略字段和虚拟设置器</td>
+</tr>
+<tr>
+<td>[options.isNewRecord=true]</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.include]</td>
+<td>Array</td>
+<td> 用于构建<code>prefetched/included</code>模型，参见 <code>set</code></td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-create">3.18 <code>create()</code> - 创建保存新实例</h4>
+<pre>create(values, [options]) -> Promise.&lt;Instance&gt;</pre>
+<p>构建一个新的模型实例，并进行保存。与<code>build()</code>方法不同的是，此方法除创建新实例外，还会将其保存到对应数据库表中。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>values</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.raw=false]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>时，值会忽略字段和虚拟设置器</td>
+</tr>
+<tr>
+<td>[options.isNewRecord=true]</td>
+<td>Boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.fields]</td>
+<td>Array</td>
+<td>如果设置后，只有列表中区别的列才会进行保存</td>
+</tr>
+<tr>
+<td>[options.include]</td>
+<td>Array</td>
+<td> 用于构建<code>prefetched/included</code>模型，参见 <code>set</code></td>
+</tr>
+<tr>
+<td>[options.onDuplicate]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个用于打印查询时所执行sql的函数</td>
+</tr>
+<tr>
+<td>[options.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>指定schema的 search_path (仅 Postgres)</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>当打印SQL日志时同时输出查询执行时间（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-findOrInitialize">3.19 <code>findOrInitialize()</code> - 查找或初始化</h4>
+<pre>findOrInitialize -> Promise.&lt;Instance, initialized&gt;</pre>
+<p>查找一行记录，如果不存在则创建（不保存）实例</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>options.where</td>
+<td>Object</td>
+<td>查询属性</td>
+</tr>
+<tr>
+<td>[options.defaults]</td>
+<td>Object</td>
+<td>用于创建新实例的默认值</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个用于打印查询时所执行sql的函数</td>
+</tr>
+<tr>
+<td>[options.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>指定schema的 search_path (仅 Postgres)</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>当打印SQL日志时同时输出查询执行时间（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><strong>别名：<code>findOrBuild</code></strong></p>
+<p><br /></p>
+<h4 id="api-findOrCreate">3.20 <code>findOrCreate()</code> - 查找或创建</h4>
+<pre>findOrCreate(options) -> Promise.&lt;Instance, created&gt;</pre>
+<p>查找一行记录，如果不存在则创建实例并保存到数据库中</p>
+<p>在这个方法中，如果<code>options</code>对象中没有传入事务，那么会在内部自动创建一个新的事务，以防止在创建完成之前有新匹配查询进入。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>options.where</td>
+<td>Object</td>
+<td>查询属性</td>
+</tr>
+<tr>
+<td>[options.defaults]</td>
+<td>Object</td>
+<td>用于创建新实例的默认值</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-findCreateFind">3.21 <code>findCreateFind()</code> - 查找或创建</h4>
+<pre>findCreateFind(options) -> Promise.&lt;Instance, created&gt;</pre>
+<p>效率更高的<code>findOrCreate</code>，不会在事务中执行。首先会尝试进行查询，如果为空则尝试创建，如果是唯一约束则尝试再次查找。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>options.where</td>
+<td>Object</td>
+<td>查询属性</td>
+</tr>
+<tr>
+<td>[options.defaults]</td>
+<td>Object</td>
+<td>用于创建新实例的默认值</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-upsert">3.22 <code>upsert()</code> - 创建或更新</h4>
+<pre>upsert(values, [options]) -> Promise.&lt;created&gt;</pre>
+<p>创建或更新一行。如果匹配到主键或唯一约束键时会进行更新。</p>
+<p><em>执行详细：</em></p><ul>
+<li>MySQL - 做为单条查询执行 <code>INSERT values ON DUPLICATE KEY UPDATE values</code></li>
+<li>PostgreSQL - 作为一个临时性的异常处理函数来实现: <code>INSERT EXCEPTION WHEN unique_constraint UPDATE</code></li>
+<li>SQLite - 做为两条查询执行 <code>INSERT; UPDATE</code>。这意味着，无论该行是否存在都会进行更新</li>
+</ul>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>values</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.validate=true]</td>
+<td>Boolean</td>
+<td>插入前进行验证</td>
+</tr>
+<tr>
+<td>[options.fields=Object.keys(this.attributes)]</td>
+<td>Array</td>
+<td>要插入/更新字段。默认全部</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><strong>别名：<code>insertOrUpdate</code></strong></p>
+<p><br /></p>
+<h4 id="api-bulkCreate">3.23 <code>bulkCreate()</code> - 创建多条记录</h4>
+<pre>bulkCreate(records, [options]) -> Promise.&lt;Array.&lt;Instance&gt;&gt;</pre>
+<p>批量创建并保存多个实例。</p>
+<p>处理成功后，会在回调函数中返回一个包含多个实例的数组。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>records</td>
+<td>Array</td>
+<td>要创建实例的对象（键/值 对）列表</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.fields]</td>
+<td>Array</td>
+<td>要插入的字段。默认全部</td>
+</tr>
+<tr>
+<td>[options.validate=true]</td>
+<td>Boolean</td>
+<td>插入每条记录前进行验证</td>
+</tr>
+<tr>
+<td>[options.hooks=true]</td>
+<td>Boolean</td>
+<td>在执行前/后创建钩子</td>
+</tr>
+<tr>
+<td>[options.individualHooks=false]</td>
+<td>Boolean</td>
+<td>在执行前/后为每个实例创建钩子</td>
+</tr>
+<tr>
+<td>[options.ignoreDuplicates=false]</td>
+<td>Boolean</td>
+<td>忽略重复主键（Postgres不支持）</td>
+</tr>
+<tr>
+<td>[options.updateOnDuplicate]</td>
+<td>Array</td>
+<td>如果行键已存在是否更新（mysql & mariadb支持）. 默认为更新</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-truncate">3.24 <code>truncate()</code> - 截断模型</h4>
+<pre>truncate([options]) -> Promise</pre>
+<p>截断模型的所有实例，这个方法是<code>Model.destroy({ truncate: true })</code>便捷方法。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>records</td>
+<td>Array</td>
+<td>要创建实例的对象（键/值 对）列表</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options.cascade=false]</td>
+<td>Boolean | function</td>
+<td>仅适用于连接查询时的<code>TRUNCATE</code>操作，截断所有外键匹配的表</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-destroy">3.25 <code>destroy()</code> - 删除记录</h4>
+<pre>destroy(options) -> Promise.&lt;Integer&gt;</pre>
+<p>删除多个实例，或设置deletedAt的时间戳为当前时间（当启用<code>paranoid</code>时）</p>
+<p>执行成功后返回被删除的行数</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.where]</td>
+<td>Object</td>
+<td>筛选条件</td>
+</tr>
+<tr>
+<td>[options.hooks=true]</td>
+<td>Boolean</td>
+<td>在执行前/后创建钩子</td>
+</tr>
+<tr>
+<td>[options.individualHooks=false]</td>
+<td>Boolean</td>
+<td>在执行前/后为每个实例创建钩子</td>
+</tr>
+</tr>
+<tr>
+<td>[options.limit]</td>
+<td>Number</td>
+<td>要删除的行数</td>
+</tr>
+<tr>
+<td>[options.force=false]</td>
+<td>Boolean</td>
+<td>删除而不是设置 deletedAt 为当前时间戳 (仅启用 <code>paranoid</code> 时适用)</td>
+</tr>
+<tr>
+<td>[options.truncate=false]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>时，会使用<code>TRUNCATE</code>代替<code>DELETE FROM</code>，这时会忽略<code>where</code>和<code>limit</code>选项</td>
+</tr>
+<tr>
+<td>[options.cascade=false]</td>
+<td>Boolean</td>
+<td>仅适用于连接查询时的<code>TRUNCATE</code>操作，截断所有外键匹配的表</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-restore">3.26 <code>restore()</code> - 恢复记录</h4>
+<pre>restore(options) -> Promise.&lt;undefined&gt;</pre>
+<p>恢复多个实例，当启用<code>paranoid</code>时</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.where]</td>
+<td>Object</td>
+<td>筛选条件</td>
+</tr>
+<tr>
+<td>[options.hooks=true]</td>
+<td>Boolean</td>
+<td>在执行前/后创建钩子</td>
+</tr>
+<tr>
+<td>[options.individualHooks=false]</td>
+<td>Boolean</td>
+<td>在执行前/后为每个实例创建钩子</td>
+</tr>
+</tr>
+<tr>
+<td>[options.limit]</td>
+<td>Number</td>
+<td>要恢复的行数</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-update">3.27 <code>update()</code> - 更新记录</h4>
+<pre>update(values, options) -> Promise.&lt;Array.&lt;affectedCount, affectedRows&gt;&gt;</pre>
+<p>更新所匹配的多个实例。promise回调中会返回一个包含一个或两个元素的数组，第一个元素始终表示受影响的行数，第二个元素表示实际影响的行（仅Postgre<code>options.returning</code>为true时受支持）</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>values</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>options.where</td>
+<td>Object</td>
+<td>筛选条件</td>
+</tr>
+<tr>
+<td>[options.fields]</td>
+<td>Array</td>
+<td>要更新字段，默认为全部</td>
+</tr>
+<tr>
+<td>[options.validate=true]</td>
+<td>Boolean</td>
+<td>更新每条记录前进行验证</td>
+</tr>
+<tr>
+<td>[options.hooks=true]</td>
+<td>Boolean</td>
+<td>在执行更新前/后创建钩子</td>
+</tr>
+<tr>
+<td>[options.individualHooks=false]</td>
+<td>Boolean</td>
+<td>在执行更新前/后为每个实例创建钩子</td>
+</tr>
+<tr>
+<td>[options.sideEffects=true]</td>
+<td>Boolean</td>
+<td>是否更新任何虚拟设置</td>
+</tr>
+<tr>
+<td>[options.returning=false]</td>
+<td>Boolean</td>
+<td>返回受影响的行 (仅适用于 postgres)</td>
+</tr>
+<tr>
+<td>[options.limit]</td>
+<td>Number</td>
+<td>要更新的行数 (仅适用于 mysql 和 mariadb)</td>
+</tr>
+<tr>
+<td>[options.transaction]</td>
+<td>Transaction</td>
+<td>在事务中执行查询</td>
+</tr>
+<tr>
+<td>[options.silent=false]</td>
+<td>Boolean</td>
+<td>如果为<code>true</code>，updatedAt字段将不会更新</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-describe">3.28 <code>describe()</code> - 查询表信息</h4>
+<pre>describe() -> Promise</pre>
+<p>运行一个表的描述查询，返回结果中将包含属性及其类型：</p>
+<pre>let User = sequelize.define('user', {
+  firstName: Sequelize.STRING,
+  lastName: Sequelize.STRING
+});
+
+User.describe().then(function(result){
+  console.log(result);
+})
+// 结果如下
+{ id: 
+   { type: 'INT(11)',
+     allowNull: false,
+     defaultValue: null,
+     primaryKey: true },
+  firstName: 
+   { type: 'VARCHAR(255)',
+     allowNull: true,
+     defaultValue: null,
+     primaryKey: false },
+  lastName: 
+   { type: 'VARCHAR(255)',
+     allowNull: true,
+     defaultValue: null,
+     primaryKey: false }
+}</pre>
+                        </div>
+                   </article>
+                   <div>
+
+	<p>下一篇：<a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的关系/关联</a>
+
+
+	<p>上一篇：<a href="/nodejs/npm/VkYIaRPz-.html">Sequelize 中文API文档－1. 快速入门、Sequelize类</a>
+
+</div>
+              </div>
+
+              <div id="sidebar" class="col-sm-4 col-md-4">
+                  <aside class="widget">
+    <form method="post" action="/search" class="form-horizontal">
+    <div class="form-group">
+        <div class="col-sm-9">
+            <input placeholder="关键字" name="keyword" class="form-control" type="text"  >
+        </div>
+        <div class="col-sm-3">
+            <button type="submit" class="btn btn-default">&nbsp;&nbsp;搜索&nbsp;&nbsp;</button>
+        </div>
+    </div>
+    </form>
+</aside>
+                  
+<aside class="widget">
+    <h4>文章分类</h4>
+    <ul class="grove-list">
+    
+    	
+    		<li><a href="/nodejs/core">基础、核心、API</a></li>
+    	
+    
+    	
+    		<li class="active"><a href="#">包、应用</a></li>
+    	
+    
+    </ul>
+</aside>
+
+                  
+<aside class="widget">
+    <h4>阅读排行</h4>
+    <ul class="grove-list">
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VkYIaRPz-.html">Sequelize 中文API文档－1. 快速入门、Seq...</a> (111793)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定...</a> (111550)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a> (36951)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/linux/management/NymXRUieg.html">解决类似 /usr/lib64/libstdc++.so....</a> (36371)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的...</a> (31834)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/EkwKysXIl.html">HTTP请求方法：GET、HEAD、POST、PUT、DE...</a> (14940)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/javascript/js/41KMSZ9a.html">［ES6］Promise对象Promise.all()方法...</a> (13937)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/N1sdaHTzb.html">Sequelize 中文API文档－5. 实例的使用、In...</a> (13690)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJHw6ScNb.html">bluebird与原生Promise对象及bluebird...</a> (12755)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/database/mongo/E1tWQz4_e.html">MongoDB索引管理－索引的创建、查看、删除</a> (12430)</h5>
+         </li>
+        
+    </ul>
+</aside>
+
+                  <aside class="widget">
+    <h4>最新文章</h4>
+    <ul class="grove-list">
+    
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/core/Sy-2trZhQ.html">Node.js 的 Http/2 模块</a></h5>
+              <p><code>http2</code>模块是自Node.js<code>v8.4.0</code>起...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/r1IhFZV-X.html">Blockly 创建自定义块-Blockly 开发者工具</a></h5>
+              <p>Blockly Developer Tools 是一个基于Web的开发者工具，它可以通过配置自动化...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/H1huYbEWQ.html">Blockly 创建自定义块-概述</a></h5>
+              <p>将 Blockly 集成到应用中后，或多或少总是需要创建一些<code>"块"</code>。本篇...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/S1BhIhdtG.html">Sequelize 嵌套模型查询及嵌套模型字段排序</a></h5>
+              <p>Sequelize 的“嵌套模型查询”最终会生成SQL“连接查询”语句，即生成'inner joi...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/By7L5p3ff.html">gyp 文件输入格式参考</a></h5>
+              <p><code>GYP</code>（node-gyp）基于<code>.gyp</code>文件构建...</p>
+         </li>
+        
+    
+    </ul>
+</aside>
+                  <!-- <aside class="widget">
+    <h4>广告</h4>
+    <p><a href="http://redirect.simba.taobao.com/rd?w=unionnojs&f=http%3A%2F%2Fai.taobao.com%2Fauction%2Fedetail.htm%3Fe%3D80FuZnNB1TS6k0Or%252B%252BH4tPg7Qoo6gIwW72fxp1Fq8BiLltG5xFicOdXrTUTgh9sMDPIwxrc30rhDsYaO8QAt%252FkUldzjpLCiPsn0%252BfXTZJrM4I6TE1Mm7FG3abJM7sDg2X7UB%252FLMklcjcDCUJyXw5Pg%253D%253D%26ptype%3D100010%26from%3Dbasic&k=5ccfdb950740ca16&c=un&b=alimm_0&p=mm_26749822_9476439_31826248" rel="nofollow">一包饼〜〜〜</a></p>
+</aside> -->
+                  
+
+                  <aside class="widget">
+    <h4>交流群：564850876</h4>
+    <p><img src="/img/qq-group.png" alt="交流群：564850876" /></p>
+</aside>
+                  <!-- <aside class="widget last">
+	<h4>友情链接</h4>
+	<ul class="grove-list">
+	     <li><a href="http://www.koocode.com" target="_blank">酷码</a></li>
+	</ul>
+</aside> -->
+              </div>
+         </div>
+    </section>
+</div>
+<script type="text/javascript">
+var xhr = new XMLHttpRequest();
+xhr.open("put", "/nodejs/npm/V1PExztfb.html", true);
+// xhr.onreadystatechange = function() { if (xhr.readyState == 4) {console.log(xhr.responseText);}}
+xhr.send();
+</script>
+<footer>
+<div class="container">
+    <!-- <div class="row info">
+        <div class="col-sm-3 residence">
+        
+        </div>
+        <div class="col-sm-5 touch">
+            <ul>
+                <li><strong></strong></li>
+                <li>email：</strong>cn.liuht@gmail.com</li>
+            </ul>
+        </div>
+    </div> -->
+    <div class="row credits">
+        <div class="col-md-12">
+            <div class="row copyright">
+                <div class="col-md-12">
+                 Copyright ©2015-2017 www.itbilu.com all rights reserved<a href="http://www.miitbeian.gov.cn/" target="_blank">京ICP备11014171号-3</a>
+                </div>
+            </div>
+        </div>            
+    </div>
+</div>
+</footer>
+</div>
+<script type="text/javascript" src="//cdn.itbilu.com/js/main-min.js"></script>
+<script type="text/javascript">
+	$(function () { $("[data-toggle='tooltip']").tooltip(); });
+	
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?2249745ad1ce80c1744fc6aede553fc1";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	 
+	(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+</body>
+</html>

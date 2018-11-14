@@ -1,0 +1,750 @@
+<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta name="baidu-site-verification" content="O5DO1n0DYd" />
+	<meta name="google-site-verification" content="JpblxCnu30QFTXwwVV3BFBDP9ObDXUOXlhFWiVIYsOo" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="&lt;code&gt;Instance&lt;/code&gt;类表示数据库中的一行记录，该类不能直接实例化，而应该由&lt;code&gt;Model&lt;/code&gt;对象创建。&lt;code&gt;Instance&lt;/code&gt;实例有两种，由&lt;code&gt;Model.build&lt;/code&gt;方法创建的非持久化实例，和由&lt;code&gt;Model.create&lt;/code&gt;方法创建的持久化实例。应该注意，&lt;code&gt;Instance&lt;/code&gt;翻译后也叫做“实例”，但它在Sequelize 中是一个类，它的实例应该叫做“实例”类的实例。" />
+	<title>Sequelize 中文API文档－5. 实例的使用、Instance类介绍 - IT笔录</title>
+	<link rel="canonical" href="//itbilu.com/nodejs/npm/N1sdaHTzb.html"/>
+	<link rel="icon" href="/img/logo_32X32.ico" type="image/x-icon" />
+	<link href="//cdn.itbilu.com/css/main-min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+     <div class="container">
+          <div class="navbar navbar-default" role="navigation">
+               <div class="navbar-header">
+                    <a class="navbar-brand" href="/"> 
+                         <img src="/img/logo.png" alt="optional logo" height="90" width="90"> 
+                         <span class="logo_title"><strong>IT笔录</strong></span> 
+                         <span class="logo_subtitle">学习，记录，整理</span> 
+                    </a>
+                    <a class="btn btn-navbar btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                         <span class="nb_left pull-left"> 
+                              <span class="fa fa-reorder"></span>
+                         </span>
+                         <span class="nb_right pull-right">menu</span>
+                    </a>
+               </div>
+               <div class="collapse navbar-collapse">
+                    <ul class="nav pull-right navbar-nav">
+                         <li ><a href="/">首页</a></li>
+                         <li  class="active"><a href="/nodejs">Nodejs</a></li>
+                         <li ><a href="/javascript">javaScript</a></li>
+                         <li ><a href="/database">数据库</a></li>
+                         <li ><a href="/linux">Linux</a></li>
+                         <li ><a href="/tools">工具</a></li>
+                         <li ><a href="/other">其它</a></li>
+                    </ul>
+               </div>
+          </div>
+     </div>
+</header>
+<div class="main">
+<div class="container">
+    <section>
+         <div class="row breadcrumb-row">
+      <ul class="breadcrumb">
+      	
+      		<li><a href="/">首页</a></li>
+      		
+      		    
+                <li><a href="/nodejs">Node.js</a></li>
+                
+                    <li><a href="/nodejs/npm">包、应用</a></li>
+                
+              
+      		
+      	
+      </ul>
+ </div>
+         <div class="row">
+              <div id="leftcol" class="col-sm-8 col-md-8">
+                 <h1>Sequelize 中文API文档－5. 实例的使用、Instance类介绍</h1>
+                   <p><i class="fa fa-clock-o" title="发布时间"></i>&nbsp;2016年05月24日
+                   &nbsp;&nbsp;
+                   <i class="fa fa-eye" title="阅读"></i>
+                   13691
+                   &nbsp;&nbsp;
+                   <span data-toggle="tooltip" title="声明：本站文章及示例基于特定的环境或软件版本，本站不为因参考本站文章引起的错误或损失负责。在使用前请自行验证是否可用于实际环境。如有纰漏或错误，欢迎进群指正、交流。"><i class="fa fa-exclamation-circle"></i>&nbsp;声明</span>
+                  </p>
+                   <article class="post">
+                        <div class="post_content">
+                        
+                        
+<p><br /></p>
+<p><code>Instance</code>类表示数据库中的一行记录，该类不能直接实例化，而应该由<code>Model</code>对象创建。<code>Instance</code>实例有两种，由<code>Model.build</code>方法创建的非持久化实例，和由<code>Model.create</code>方法创建的持久化实例。应该注意，<code>Instance</code>翻译后也叫做“实例”，但它在Sequelize 中是一个类，它的实例应该叫做“实例”类的实例。</p>
+<p><br /></p>
+<ol>
+	<li><a href="#usage">实例的创建与使用</a>
+	<ul>
+		<li><a href="#usage-building">1.1 构建非持久化实例</a></li>
+		<li><a href="#usage-create">1.2 创建持久化实例</a></li>
+		<li><a href="#usage-updating">1.3 实例的更新/保存/持久化</a></li>
+		<li><a href="#usage-delete">1.4 删除持久化实例</a></li>
+		<li><a href="#usage-bulk">1.5 批量操作</a></li>
+		<li><a href="#usage-values">1.6 实例值</a></li>
+		<li><a href="#usage-reloading">1.7 实例的重新加载</a></li>
+		<li><a href="#usage-increment">1.8 实例字段值的增大</a></li>
+		<li><a href="#usage-decrement">1.9 实例字段值的减小</a></li>
+	</ul>
+	</li>
+	<li><a href="#api">2. <code>Instance</code>类的API</a>
+	<ul>
+		<li><a href="#api-isNewRecord">2.1 <code>isNewRecord</code> － 是否新记录</a></li>
+		<li><a href="#api-Model">2.2 <code>Model()</code> － 创建实例的模型</a></li>
+		<li><a href="#api-sequelize">2.3 <code>sequelize()</code> － Sequelize实例</a></li>
+		<li><a href="#api-where">2.4 <code>where()</code> － 实例的查询条件</a></li>
+		<li><a href="#api-getDataValue">2.5 <code>getDataValue()</code> － 获取值</a></li>
+		<li><a href="#api-setDataValue">2.6 <code>setDataValue()</code> － 设置值</a></li>
+		<li><a href="#api-get">2.7 <code>get()</code> － 获取值（单个或全部）</a></li>
+		<li><a href="#api-set">2.8 <code>set()</code> － 设置值</a></li>
+		<li><a href="#api-changed">2.9 <code>changed()</code> － 判断是否修改</a></li>
+		<li><a href="#api-previous">2.10 <code>previous()</code> － 返回修改前的值</a></li>
+		<li><a href="#api-save">2.11 <code>save()</code> － 保存实例到数据库</a></li>
+		<li><a href="#api-reload">2.12 <code>reload()</code> － 重新加载数据</a></li>
+		<li><a href="#api-validate">2.13 <code>validate()</code> － 验证属性</a></li>
+		<li><a href="#api-update">2.14 <code>update()</code> － 设置并保存</a></li>
+		<li><a href="#api-destroy">2.15 <code>destroy()</code> － 删除</a></li>
+		<li><a href="#api-restore">2.16 <code>restore()</code> － 数据恢复</a></li>
+		<li><a href="#api-increment">2.17 <code>increment()</code> － 字段值增加</a></li>
+		<li><a href="#api-decrement">2.18 <code>decrement()</code> － 字段值减小</a></li>
+		<li><a href="#api-equals">2.19 <code>equals()</code> － 实例值是否相等</a></li>
+		<li><a href="#api-equalsOneOf">2.20 <code>equalsOneOf()</code> － 实例值其中的一个相等</a></li>
+		<li><a href="#api-toJSON">2.21 <code>toJSON()</code> － 转换成JSON</a></li>
+	</ul>
+	</li>
+</ol>
+<h3 id="usage">1. 实例的创建与使用</h3>
+<h4 id="usage-building">1.1 构建非持久化实例</h4>
+<p>为了创建定义类的实例，需要像下面这样做。使用<code>build</code>方法会返回一个未保存的对象，你应该显式的调用<code>save</code>方法保存。</p>
+<pre>var project = Project.build({
+  title: '这是一个项目',
+  description: '项目的描述，来自：itbilu.com'
+})
+ 
+var task = Task.build({
+  title: 'specify the project idea',
+  description: 'bla',
+  dea</pre>
+<p>构建的实例会自动获取我们定义的默认值：</p>
+<pre>// 先定义模型
+var Task = sequelize.define('task', {
+  title: Sequelize.STRING,
+  rating: { type: Sequelize.STRING, defaultValue: 3 }
+})
+ 
+// build 构建一个实例
+var task = Task.build({title: 'very important task'})
+ 
+task.title  // ==> 'very important task'
+task.rating // ==> 3</pre>
+<p>要将构建非持久实例保存到数据库中，需要使用<code>use</code>方法：</p>
+<pre>project.save().then(function() {
+  // 保存后的回调
+})
+ 
+task.save().catch(function(error) {
+  // mhhh, wth!
+})
+ 
+// 也可以链式的build构建实例，再you can also build, save and access the object with chaining:
+Task
+  .build({ title: 'foo', description: 'bar', deadline: new Date() })
+  .save()
+  .then(function(anotherTask) {
+    // 现在可以通过anotherTask变量，访问已保存的 task
+  }).catch(function(error) {
+    // Ooops, 错误处理
+  })</pre>
+<p><br /></p>
+<h4 id="usage-create">1.2 创建持久化实例</h4>
+<p>除了显式的调用<code>save</code>方法保存实例外，还可以<code>create</code>方法创建并保存实例。</p>
+<pre>Task.create({ title: 'foo', description: 'bar', deadline: new Date() }).then(function(task) {
+  // 现在可以通过 task 变量访问新创建的 Task
+})</pre>
+<p><br /></p>
+<h4 id="usage-updating">1.3 实例的更新/保存/持久化</h4>
+<p>修改实例的一些值，并保存到数据库可以通过以下两种方式实现：</p>
+<pre>// 方法 1
+task.title = 'a very different title now'
+task.save().then(function() {})
+ 
+// 方法 2
+task.update({
+  title: 'a very different title now'
+}).then(function() {})</pre>
+<p>可样可以设置哪些属性需要保存，传入一个包含字段名的数组即可。</p>
+<pre>task.title = 'foooo'
+task.description = 'baaaaaar'
+task.save({fields: ['title']}).then(function() {
+ // 现在 title 是 'foooo' 但是 description 还是和以前一样
+})
+ 
+// 同样可以使用 update 方法进行保存:
+task.update({ title: 'foooo', description: 'baaaaaar'}, {fields: ['title']}).then(function() {
+ // 现在 title 是 'foooo' 但是 description 还是和以前一样
+})</pre>
+<p>当调用<code>save</code>但不做任何修改时，该方法不会做任何操作。</p>
+<p><br /></p>
+<h4 id="usage-delete">1.4 删除持久化实例</h4>
+<p>创建对象并获取对象引用后，可以通过<code>destroy</code>方法将其从数据库中删除：</p>
+<pre>Task.create({ title: 'a task' }).then(function(task) {
+  // 这样删除...
+  return task.destroy();
+}).then(function() {
+ // 删除完成 :)
+})</pre>
+<p><br /></p>
+<h4 id="usage-bulk">1.5 批量操作</h4>
+<p>除更新单个实例外，还可以创建、更新和删除多个实例。批量操作的方法有：</p>
+<ul>
+<li><code>Model.bulkCreate</code></li>
+<li><code>Model.update</code></li>
+<li><code>Model.destroy</code></li>
+</ul>
+<p>当操作多个模型时，回调中不会返回DAO 实例。<code>bulkCreate</code>会一个包含多个实例/DAO的数组，但不像<code>create</code>，结果中没有自增属性。而<code>update</code>和<code>destroy</code>会返回受影响的行数。</p>
+<p>批量创建操作：</p>
+<pre>User.bulkCreate([
+  { username: 'barfooz', isAdmin: true },
+  { username: 'foo', isAdmin: true },
+  { username: 'bar', isAdmin: false }
+]).then(function() { // Notice: There are no arguments here, as of right now you'll have to...
+  return User.findAll();
+}).then(function(users) {
+  console.log(users) // ... in order to get the array of user objects
+})</pre>
+<p>更新多条数据：</p>
+<pre>Task.bulkCreate([
+  {subject: 'programming', status: 'executing'},
+  {subject: 'reading', status: 'executing'},
+  {subject: 'programming', status: 'finished'}
+]).then(function() {
+  return Task.update(
+    { status: 'inactive' }, /* set attributes' value */,
+    { where: { subject: 'programming' }} /* where criteria */
+  );
+}).spread(function(affectedCount, affectedRows) {
+  // .update 会返会一个包含两个值的数组，使用 .spread展开
+  // 注意，只有支持 returning: true属性的数据库才会返回 affectedRows
+
+  // affectedCount 是 2
+  return Task.findAll();
+}).then(function(tasks) {
+  console.log(tasks) // subject为 'programming' 的对象的 status属性会更新为 'inactive'
+})</pre>
+<p>删除多条数据：</p>
+<pre>Task.bulkCreate([
+  {subject: 'programming', status: 'executing'},
+  {subject: 'reading', status: 'executing'},
+  {subject: 'programming', status: 'finished'}
+]).then(function() {
+  return Task.destroy({
+    where: {
+      subject: 'programming'
+    },
+    truncate: true /* 这会对表使用truncate（截断）操作 */
+  });
+}).then(function(affectedRows) {
+  // affectedRows 是2 2
+  return Task.findAll();
+}).then(function(tasks) {
+  console.log(tasks) // 没有 programming, 只有 reading :(
+})</pre>
+<p>如果你是从用户输入接收值，那可想要设置要插入的值。<code>bulkCreate()</code>接受第二个参数对象，你可以在其中传入一个<code>fields</code>（数组）参数，以表示哪些字段需要插入。</p>
+<pre>User.bulkCreate([
+  { username: 'foo' },
+  { username: 'bar', admin: true}
+], { fields: ['username'] }).then(function() {
+  // nope bar, you can't be admin!
+})
+</pre>
+<p><code>bulkCreate</code>是一种快速的插入数据的方式，但在插入多行数据时，我们又不希望牺牲模型验证，这时可以通过<code>validate</code>参数告诉Sequelize只有通过筛选的数据才能插入数据库。</p>
+<pre>var Tasks = sequelize.define('task', {
+  name: {
+    type: Sequelize.STRING,
+    validate: {
+      notNull: { args: true, msg: 'name cannot be null' }
+    }
+  },
+  code: {
+    type: Sequelize.STRING,
+    validate: {
+      len: [3, 10]
+    }
+  }
+})
+ 
+Tasks.bulkCreate([
+  {name: 'foo', code: '123'},
+  {code: '1234'},
+  {name: 'bar', code: '1'}
+], { validate: true }).catch(function(errors) {
+  /* console.log(errors) would look like:
+  [
+    { record:
+    ...
+    errors:
+      { name: 'SequelizeValidationError',
+        message: 'Validation error',
+        errors: [Object] } },
+    { record:
+      ...
+      errors:
+        { name: 'SequelizeValidationError',
+        message: 'Validation error',
+        errors: [Object] } }
+  ]
+  */
+})</pre>
+<p><br /></p>
+<h4 id="usage-values">1.6 实例值</h4>
+<p>当我们打印实例时，会看到很多额外的值。为了隐藏这些东西，可以使用<code>get</code>-属性，并使用<code>plain = true</code>选项来返回实例值。</p>
+<pre>Person.create({
+  name: 'Rambow',
+  firstname: 'John'
+}).then(function(john) {
+  console.log(john.get({
+    plain: true
+  }))
+})
+ 
+// result:
+ 
+// { name: 'Rambow',
+//   firstname: 'John',
+//   id: 1,
+//   createdAt: Tue, 01 May 2012 19:12:16 GMT,
+//   updatedAt: Tue, 01 May 2012 19:12:16 GMT
+// }</pre>
+<p><br /></p>
+<h4 id="usage-reloading">1.7 实例的重新加载</h4>
+<p>实例中有一个<code>reload</code>方法，该方法会同步数据中的当前的数据，并使用刚加载的数据对模型属性进行重写。</p>
+<pre>Person.findOne({ where: { name: 'john' } }).then(function(person) {
+  person.name = 'jane'
+  console.log(person.name) // 'jane'
+ 
+  person.reload().then(function() {
+    console.log(person.name) // 'john'
+  })
+})</pre>
+<p><br /></p>
+<h4 id="usage-increment">1.8 实例字段值的增大</h4>
+<p><code>increment</code>方法，可以为实例属性(字段)增加一个确定义的字面值，该方法直接单个或多个字段属性值的增加。</p>
+<p>为一个属性增加值：</p>
+<pre>User.findById(1).then(function(user) {
+  return user.increment('my-integer-field', {by: 2})
+}).then(/* ... */)</pre>
+<p>为多个属性增加值：</p>
+<pre>User.findById(1).then(function(user) {
+  return user.increment([ 'my-integer-field', 'my-very-other-field' ], {by: 2})
+}).then(/* ... */)</pre>
+<p>也可以使用对象的形式为多个属性增加值：</p>
+<pre>User.findById(1).then(function(user) {
+  return user.increment({
+    'my-integer-field':    2,
+    'my-very-other-field': 3
+  })
+}).then(/* ... */)</pre>
+<p><br /></p>
+<h4 id="usage-decrement">1.9 实例字段值的减小</h4>
+<p>我们可以向<code>increment</code>方法传入一个负数来减小字段值。相对应的，还有一个<code>decrement</code>方法，该方法用于减小字段值：</p>
+<p>为一个属性减小值：</p>
+<pre>User.findById(1).then(function(user) {
+  return user.decrement('my-integer-field', {by: 2})
+}).then(/* ... */)</pre>
+<p>为多个属性减小值：</p>
+<pre>User.findById(1).then(function(user) {
+  return user.decrement([ 'my-integer-field', 'my-very-other-field' ], {by: 2})
+}).then(/* ... */)</pre>
+<p>也可以使用对象的形式为多个属性减小值：</p>
+<pre>User.findById(1).then(function(user) {
+  return user.decrement({
+    'my-integer-field':    2,
+    'my-very-other-field': 3
+  })
+}).then(/* ... */)</pre>
+<p>更多关于<code>increment</code>、<code>increment</code>的使用请参考：</p>
+<ul>
+  <li><a href="http://itbilu.com/nodejs/npm/N1pPjUdMf.html#single" target="_blank"><code>单实例字段的自增、自减</code></a></li>
+</ul>
+<p><br /></p>
+<h3 id="api">2. <code>Instance</code>类的API</h3>
+<p><code>Instance</code>类表示一个实例，表示数据库中的一行。它不能通过构造函数实例化，而应该通过<a href="http://itbilu.com/nodejs/npm/V1PExztfb.html#api-findAll" target="_blank">Model.find*</a>或<a href="http://itbilu.com/nodejs/npm/V1PExztfb.html#api-create" target="_blank">Model.create</a>等方法创建。</p>
+<p>实例中包含一个<code>dataValues</code>属性，其中存储了实例实际所要操作的值。<code>dataValues</code>中的值可以通过以下几种方式访问：</p>
+<pre>instance.field
+// 等价于
+instance.get('field')
+// 等价于
+instance.getDataValue('field')</pre>
+<p>如果定义了访问器(getter)/设置器(setter)，字段值从其中访问而不是从<code>dataValues</code>。一般会直接访问或使用<code>get</code>来访问属性值，而<code>getDataValue</code>只用于自定义的访问器。</p>
+<p><strong>相关</strong></p>
+<ul>
+<li><a href="http://itbilu.com/nodejs/npm/VkYIaRPz-.html#api-instance-method" target="_blank">Sequelize#define</a></li>
+</ul>
+<p><br /></p>
+<h4 id="api-isNewRecord">2.1 <code>isNewRecord</code> － 是否新记录</h4>
+<pre>instance.isNewRecord -> Boolean</pre>
+<p>当实例是未保存到数据库的<a href="#usage-building">非持久化实例</a>时，返回<code>true</code></p>
+<p><br /></p>
+<h4 id="api-Model">2.2 <code>Model()</code> － 创建实例的模型</h4>
+<pre>instance.Model() -> Model</pre>
+<p>返回创建实例的<code>Model</code>。</p>
+<p><strong>相关</strong></p>
+<ul>
+<li><a href="http://itbilu.com/nodejs/npm/V1PExztfb.html#api" target="_blank">Model</a></li>
+</ul>
+<p><br /></p>
+<h4 id="api-sequelize">2.3 <code>sequelize()</code> － Sequelize实例</h4>
+<pre>instance.sequelize() -> Sequelize</pre>
+<p>返回Sequelize实例的引用</p>
+<p><strong>相关</strong></p>
+<ul>
+<li><a href="http://itbilu.com/nodejs/npm/VkYIaRPz-.html#api" target="_blank">Sequelize</a></li>
+</ul>
+<p><br /></p>
+<h4 id="api-where">2.4 <code>where()</code> － 实例的查询条件</h4>
+<pre>instance.where() -> Object</pre>
+<p>获取当前实例的查询条件，相当于<code>option.where</code></p>
+<p><br /></p>
+<h4 id="api-getDataValue">2.5 <code>getDataValue()</code> － 获取值</h4>
+<pre>instance.getDataValue(key) -> any</pre>
+<p>获取底层数据值。</p>
+<ul>
+	<li><code>key</code> － {String}，表示要获取值的字段名</li>
+</ul>
+<p><br /></p>
+<h4 id="api-setDataValue">2.6 <code>setDataValue()</code> － 设置值</h4>
+<pre>instance.setDataValue(key, value)</pre>
+<p>设置底层数据值。</p>
+<ul>
+	<li><code>key</code> － {String}，表示要设置值的字段名</li>
+	<li><code>value</code> － {any}，表示要设置的值</li>
+</ul>
+<p><br /></p>
+<h4 id="api-get">2.7 <code>get()</code> － 获取值（单个或全部）</h4>
+<pre>instance.get([key], [options]) -> Object|any</pre>
+<p>不提供<code>key</code>时，返回全部实例值。同样适用于虚拟访问器。</p>
+<p>提供<code>key</code>时，返回字段值或返回虚拟访问器的值。</p>
+<ul>
+	<li><code>[key]</code> － {String}，表示要访问值的字段名</li>
+	<li><code>[options]</code> － {Object}</li>
+	<li><code>[options.plain=false]</code> － {Boolean}，设置为true时，返回简单对象</li></ul>
+<p><br /></p>
+<h4 id="api-set">2.8 <code>set()</code> － 设置值</h4>
+<pre>instance.set(key, value, [options])</pre>
+<p><code>set</code>用于更新实例值。<code>set</code>更新的值会保存在底层的<code>dataValues</code>对象中，如果为所设置的<code>key</code>设置了自定义设置器，那么设置器被调用。如果要绕过这些设置器，可以在选项中设置<code>raw: true</code>选项。</p>
+<p>当通过一对象进行设置时，它会是一个循环对象，会为其中的每个<code>key/value</code>分别调用此方法。当设置<code>raw</code>时，底层的<code>dataValues</code>会被直接设置或扩展。</p>
+<p>当值被修改后，修改值会被存储在的<a href="#api-previous"><code>previous</code></a>中，并会设置一个<a href="#api-changed"><code>changed</code></a>标识。</p>
+<p><code>Set</code>同样可以用于构建关联实例。当设置时，应该确认属性键能够匹配到关系实例的别名，并确认这些选项已设置关联。</p>
+<p>在JSON/JSONB属性中，如果使用<code>.</code>分隔的字段，那么设置嵌套对象的值。</p>
+<ul>
+	<li><code>key</code> － {String | Object}，表示要设置值的字段</li>
+	<li><code>value</code> － {any}，表示要设置的值</li>
+	<li><code>[options]</code> － {Object}</li>
+	<li><code>[options.raw=false]</code> － {Boolean}，虚拟设置器会被忽略</li>
+	<li><code>[options.reset=false]</code> － {Boolean}，清除之前的设置数据</li>
+</ul>
+<p><strong>别名：<code>setAttributes</code></strong></p>
+<p><br /></p>
+<h4 id="api-changed">2.9 <code>changed()</code> － 判断是否修改</h4>
+<pre>instance.changed([key]) -> Boolean|Array</pre>
+<p>判断字段或实例是否修改过，即判断<code>dataValues</code>中的值是否与<code>_previousDataValues</code>中的值是否相同。</p>
+<p>当不传入参数时，会返回一个包含已修改字段的数组。当传入参数时，返回一个表示该字段是否修改的布尔值。</p>
+<p><br /></p>
+<h4 id="api-previous">2.10 <code>previous()</code> － 返回修改前的值</h4>
+<pre>instance.previous([key]) -> any|Array.&lt;any&gt;</pre>
+<p>返回实例修改前的值，即<code>_previousDataValues</code>属性中值。如果不传入参数，则返回所有已修改的值。</p>
+<p><br /></p>
+<h4 id="api-save">2.11 <code>save()</code> － 保存实例到数据库</h4>
+<pre>instance.save([options]) -> Promise.&lt;this|Errors.ValidationError&lt;</pre>
+<p>较验数据，通过后持久化到数据库中。这个方法仅会保存修改过的数据，如果未发生修改那么不会进行任何操作。</p>
+<p>操作成功会回调修改结果，验证失败则返回一个<code>Sequelize.ValidationError</code>对象。</p>
+<ul>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.fields]</code> - {Array.&lt;string&gt;}，可选的表示数据库中字段值，提供后仅会验证和保存其中的字段</li>
+	<li><code>[[options.silent=false]]</code> - {Boolean}，设置为 true 时，updatedAt在更新时不会发生变化</li>
+	<li><code>[options.validate=true]</code> - {Boolean}，保存前时否验证</li>
+	<li><code>[options.logging=false]</code> - {Function}，一个用于打印执行SQL的函数</li>
+	<li><code>[options.transaction=false]</code> - {Transaction}</li>
+	<li><code>[options.searchPath=DEFAULT]</code> - {String}，指定schema的 search_path (仅 Postgres)</li>
+</ul>
+<p><br /></p>
+<h4 id="api-reload">2.12 <code>reload()</code> － 重新加载数据</h4>
+<pre>instance.reload([options]) -> Promise.&lt;this&gt;</pre>
+<p>用数据库中的数据当前实例。这不同于<code>find(Instance.id)</code>，因为它会创建并返回一个新实例。而该方法是用新数据刷新当前实例。</p>
+<ul>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.logging=false]</code> - {Function}，一个用于打印执行SQL的函数</li>
+</ul>
+<p><br /></p>
+<h4 id="api-validate">2.13 <code>validate()</code> － 验证属性</h4>
+<pre>instance.validate([options]) -> Promise.&lt;Errors.ValidationError|undefined&gt;</pre>
+<p>根据模型定义的验证规则验证模型属性。验证成功时返回<code>null</code>，否则返回一个错误对象。</p>
+<ul>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.skip]</code> - {String|Array}，包含一个要跳过的验证字段的字符串或数组</li>
+</ul>
+<p><br /></p>
+<h4 id="api-update">2.14 <code>update()</code> － 设置并保存</h4>
+<pre>instance.update(updates, options) -> Promise.&lt;this&gt;</pre>
+<p>相当于调用<code>set</code>方法后再调用<code>save</code>，但它只保存传递给它确切值，使用它更新时更原子和更安全。</p>
+<ul>
+	<li><code>updates</code> - {Object}，见<a href="#api-set"><code>set</code></a></li>
+	<li><code>options</code> - {Object}，见<a href="#api-save"><code>save</code></a></li>
+</ul>
+<p><strong>别名：<code>updateAttributes</code></strong></p>
+<p><br /></p>
+<h4 id="api-destroy">2.15 <code>destroy()</code> － 删除</h4>
+<pre>instance.destroy([options={}]) -> Promise.&lt;undefined&gt;</pre>
+<p>删除实例在数据库中对应的行。设置为软删除（<code>paranoid</code>）时，数据行并不会真实删除，而是将<code>deletedAt</code>列更新为当前时间。</p>
+<ul>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.force=false]</code> - {Boolean}，强制删除。设置为 true时，软删除的模型也会强制删除</li>
+	<li><code>[options.logging=false]</code> - {Function}，一个用于打印执行SQL的函数</li>
+	<li><code>[options.transaction]</code> - {Transaction}</li>
+	<li><code>[options.searchPath=DEFAULT]</code> - {String}，指定schema的 search_path (仅 Postgres)</li>
+</ul>
+<p><br /></p>
+<h4 id="api-restore">2.16 <code>restore()</code> － 数据恢复</h4>
+<pre>instance.restore([options={}]) -> Promise.&lt;undefined&gt;</pre>
+<p>恢复实例数据，仅适用于软删除（<code>paranoid</code>）模型</p>
+<ul>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.logging=false]</code> - {Function}，一个用于打印执行SQL的函数</li>
+	<li><code>[options.transaction]</code> - {Transaction}</li>
+</ul>
+<p><br /></p>
+<h4 id="api-increment">2.17 <code>increment()</code> － 字段值增加</h4>
+<pre>instance.increment(fields, [options]) -> Promise&lt;this&gt;</pre>
+<p>为一个或多个字段增加值。这一操作在数据库中完成，也就是说它并不使用实例的存储值。其增加值使用如下语句完成：</p>
+<pre>SET column = column + X</pre>
+<p>增加后，要获取正确的实例值应该使用<a href="#api-reload"><code>reload()</code></a>方法重新加载数据。</p>
+<ul>
+	<li><code>fields</code> - {String | Array | Object}，要增加值的字段</li>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.by=1]</code> - {Integer}，要增加的数字值</li>
+	<li><code>[options.logging=false]</code> - {Function}，一个用于打印执行SQL的函数</li>
+	<li><code>[options.transaction]</code> - {Transaction}</li>
+	<li><code>[options.searchPath=DEFAULT]</code> - {String}，指定schema的 search_path (仅 Postgres)</li>
+</ul>
+<pre>instance.increment('number') // 增加 1
+instance.increment(['number', 'count'], { by: 2 }) // 'number' 和 'count'两个字段增加 2
+instance.increment({ answer: 42, tries: 1}, { by: 2 })  // 'answer'字段增加 42, 'tries' 字段增加 1，'by' 参数将忽略，因为每一列都有自己的值</pre>
+<p><br /></p>
+<h4 id="api-decrement">2.18 <code>decrement()</code> － 字段值减小</h4>
+<pre>instance.decrement(fields, [options]) -> Promise&lt;this&gt;</pre>
+<p>为一个或多个字段减小值。这一操作在数据库中完成，也就是说它并不使用实例的存储值。其增加值使用如下语句完成：</p>
+<pre>SET column = column - X</pre>
+<p>增加后，要获取正确的实例值应该使用<a href="#api-reload"><code>reload()</code></a>方法重新加载数据。</p>
+<ul>
+	<li><code>fields</code> - {String | Array | Object}，要减小值的字段</li>
+	<li><code>[options]</code> - {Object}</li>
+	<li><code>[options.by=1]</code> - {Integer}，要减小的数字值</li>
+	<li><code>[options.logging=false]</code> - {Function}，一个用于打印执行SQL的函数</li>
+	<li><code>[options.transaction]</code> - {Transaction}</li>
+	<li><code>[options.searchPath=DEFAULT]</code> - {String}，指定schema的 search_path (仅 Postgres)</li>
+</ul>
+<pre>instance.decrement('number') // 减小 1
+instance.decrement(['number', 'count'], { by: 2 }) // 'number' 和 'count'两个字段减小 2
+instance.decrement({ answer: 42, tries: 1}, { by: 2 }) // 'answer'字段减小 42, 'tries' 字段减小 1, 'by' 参数将忽略，因为每一列都有自己的值</pre>
+<p><br /></p>
+<h4 id="api-equals">2.19 <code>equals()</code> － 实例值是否相等</h4>
+<pre>instance.equals(other) -> Boolean</pre>
+<p>检查当前实例是否与<code>other</code>实例的值相等</p>
+<p><br /></p>
+<h4 id="api-equalsOneOf">2.20 <code>equalsOneOf()</code> － 实例值其中的一个相等</h4>
+<pre>instance.equalsOneOf(others) -> Boolean</pre>
+<p>检查当前实例是否与<code>others</code>数组中的任意一个实例的值相等</p>
+<p><br /></p>
+<h4 id="api-toJSON">2.21 <code>toJSON()</code> － 转换成JSON</h4>
+<pre>instance.toJSON() -> object</pre>
+<p>将当前实例转换为JSON形式，意味着会从数据库中取值，并应用所有自定义的访问器。</p>
+                        </div>
+                   </article>
+                   <div>
+
+	<p>下一篇：<a href="/nodejs/npm/EJO6CcCM-.html">Sequelize 中文API文档－6. 事务的使用与Transaction类</a>
+
+
+	<p>上一篇：<a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a>
+
+</div>
+              </div>
+
+              <div id="sidebar" class="col-sm-4 col-md-4">
+                  <aside class="widget">
+    <form method="post" action="/search" class="form-horizontal">
+    <div class="form-group">
+        <div class="col-sm-9">
+            <input placeholder="关键字" name="keyword" class="form-control" type="text"  >
+        </div>
+        <div class="col-sm-3">
+            <button type="submit" class="btn btn-default">&nbsp;&nbsp;搜索&nbsp;&nbsp;</button>
+        </div>
+    </div>
+    </form>
+</aside>
+                  
+<aside class="widget">
+    <h4>文章分类</h4>
+    <ul class="grove-list">
+    
+    	
+    		<li><a href="/nodejs/core">基础、核心、API</a></li>
+    	
+    
+    	
+    		<li class="active"><a href="#">包、应用</a></li>
+    	
+    
+    </ul>
+</aside>
+
+                  
+<aside class="widget">
+    <h4>阅读排行</h4>
+    <ul class="grove-list">
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VkYIaRPz-.html">Sequelize 中文API文档－1. 快速入门、Seq...</a> (111793)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定...</a> (111550)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a> (36951)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/linux/management/NymXRUieg.html">解决类似 /usr/lib64/libstdc++.so....</a> (36371)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的...</a> (31834)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/EkwKysXIl.html">HTTP请求方法：GET、HEAD、POST、PUT、DE...</a> (14940)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/javascript/js/41KMSZ9a.html">［ES6］Promise对象Promise.all()方法...</a> (13937)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/N1sdaHTzb.html">Sequelize 中文API文档－5. 实例的使用、In...</a> (13690)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJHw6ScNb.html">bluebird与原生Promise对象及bluebird...</a> (12755)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/database/mongo/E1tWQz4_e.html">MongoDB索引管理－索引的创建、查看、删除</a> (12430)</h5>
+         </li>
+        
+    </ul>
+</aside>
+
+                  <aside class="widget">
+    <h4>最新文章</h4>
+    <ul class="grove-list">
+    
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/core/Sy-2trZhQ.html">Node.js 的 Http/2 模块</a></h5>
+              <p><code>http2</code>模块是自Node.js<code>v8.4.0</code>起...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/r1IhFZV-X.html">Blockly 创建自定义块-Blockly 开发者工具</a></h5>
+              <p>Blockly Developer Tools 是一个基于Web的开发者工具，它可以通过配置自动化...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/H1huYbEWQ.html">Blockly 创建自定义块-概述</a></h5>
+              <p>将 Blockly 集成到应用中后，或多或少总是需要创建一些<code>"块"</code>。本篇...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/S1BhIhdtG.html">Sequelize 嵌套模型查询及嵌套模型字段排序</a></h5>
+              <p>Sequelize 的“嵌套模型查询”最终会生成SQL“连接查询”语句，即生成'inner joi...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/By7L5p3ff.html">gyp 文件输入格式参考</a></h5>
+              <p><code>GYP</code>（node-gyp）基于<code>.gyp</code>文件构建...</p>
+         </li>
+        
+    
+    </ul>
+</aside>
+                  <!-- <aside class="widget">
+    <h4>广告</h4>
+    <p><a href="http://redirect.simba.taobao.com/rd?w=unionnojs&f=http%3A%2F%2Fai.taobao.com%2Fauction%2Fedetail.htm%3Fe%3D80FuZnNB1TS6k0Or%252B%252BH4tPg7Qoo6gIwW72fxp1Fq8BiLltG5xFicOdXrTUTgh9sMDPIwxrc30rhDsYaO8QAt%252FkUldzjpLCiPsn0%252BfXTZJrM4I6TE1Mm7FG3abJM7sDg2X7UB%252FLMklcjcDCUJyXw5Pg%253D%253D%26ptype%3D100010%26from%3Dbasic&k=5ccfdb950740ca16&c=un&b=alimm_0&p=mm_26749822_9476439_31826248" rel="nofollow">一包饼〜〜〜</a></p>
+</aside> -->
+                  
+
+                  <aside class="widget">
+    <h4>交流群：564850876</h4>
+    <p><img src="/img/qq-group.png" alt="交流群：564850876" /></p>
+</aside>
+                  <!-- <aside class="widget last">
+	<h4>友情链接</h4>
+	<ul class="grove-list">
+	     <li><a href="http://www.koocode.com" target="_blank">酷码</a></li>
+	</ul>
+</aside> -->
+              </div>
+         </div>
+    </section>
+</div>
+<script type="text/javascript">
+var xhr = new XMLHttpRequest();
+xhr.open("put", "/nodejs/npm/N1sdaHTzb.html", true);
+// xhr.onreadystatechange = function() { if (xhr.readyState == 4) {console.log(xhr.responseText);}}
+xhr.send();
+</script>
+<footer>
+<div class="container">
+    <!-- <div class="row info">
+        <div class="col-sm-3 residence">
+        
+        </div>
+        <div class="col-sm-5 touch">
+            <ul>
+                <li><strong></strong></li>
+                <li>email：</strong>cn.liuht@gmail.com</li>
+            </ul>
+        </div>
+    </div> -->
+    <div class="row credits">
+        <div class="col-md-12">
+            <div class="row copyright">
+                <div class="col-md-12">
+                 Copyright ©2015-2017 www.itbilu.com all rights reserved<a href="http://www.miitbeian.gov.cn/" target="_blank">京ICP备11014171号-3</a>
+                </div>
+            </div>
+        </div>            
+    </div>
+</div>
+</footer>
+</div>
+<script type="text/javascript" src="//cdn.itbilu.com/js/main-min.js"></script>
+<script type="text/javascript">
+	$(function () { $("[data-toggle='tooltip']").tooltip(); });
+	
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?2249745ad1ce80c1744fc6aede553fc1";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	 
+	(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+</body>
+</html>

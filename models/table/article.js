@@ -2,20 +2,24 @@
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('article', {
-    id: {
+    articleId: {
       type: DataTypes.INTEGER(11).UNSIGNED,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
-      field: 'id'
+      field: 'article_id'
     },
     userId: {
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.INTEGER(11).UNSIGNED,
       allowNull: true,
+      references: {
+        model: 'user',
+        key: 'id'
+      },
       field: 'user_id'
     },
     title: {
-      type: DataTypes.CHAR(255),
+      type: DataTypes.STRING(255),
       allowNull: true,
       defaultValue: '',
       field: 'title'

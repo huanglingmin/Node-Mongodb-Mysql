@@ -1,0 +1,1189 @@
+<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta name="baidu-site-verification" content="O5DO1n0DYd" />
+	<meta name="google-site-verification" content="JpblxCnu30QFTXwwVV3BFBDP9ObDXUOXlhFWiVIYsOo" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="模型（&lt;code&gt;Model&lt;/code&gt;）之间存在各种各样的关系，如：一对一(One-To-One ）、一对多（One-To-Many）等。模型间的关系本质上是对其代表的数据库中表之间的关系描述，通过这些关系可以实现数据库中表之间主/外键约束的创建。查询时也可以基于这些关系，生成在数据库中执行的连接查询或复合查询SQL语句。" />
+	<title>Sequelize 中文API文档－3. 模型（表）之间的关系/关联 - IT笔录</title>
+	<link rel="canonical" href="//itbilu.com/nodejs/npm/41qaV3czb.html"/>
+	<link rel="icon" href="/img/logo_32X32.ico" type="image/x-icon" />
+	<link href="//cdn.itbilu.com/css/main-min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+     <div class="container">
+          <div class="navbar navbar-default" role="navigation">
+               <div class="navbar-header">
+                    <a class="navbar-brand" href="/"> 
+                         <img src="/img/logo.png" alt="optional logo" height="90" width="90"> 
+                         <span class="logo_title"><strong>IT笔录</strong></span> 
+                         <span class="logo_subtitle">学习，记录，整理</span> 
+                    </a>
+                    <a class="btn btn-navbar btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                         <span class="nb_left pull-left"> 
+                              <span class="fa fa-reorder"></span>
+                         </span>
+                         <span class="nb_right pull-right">menu</span>
+                    </a>
+               </div>
+               <div class="collapse navbar-collapse">
+                    <ul class="nav pull-right navbar-nav">
+                         <li ><a href="/">首页</a></li>
+                         <li  class="active"><a href="/nodejs">Nodejs</a></li>
+                         <li ><a href="/javascript">javaScript</a></li>
+                         <li ><a href="/database">数据库</a></li>
+                         <li ><a href="/linux">Linux</a></li>
+                         <li ><a href="/tools">工具</a></li>
+                         <li ><a href="/other">其它</a></li>
+                    </ul>
+               </div>
+          </div>
+     </div>
+</header>
+<div class="main">
+<div class="container">
+    <section>
+         <div class="row breadcrumb-row">
+      <ul class="breadcrumb">
+      	
+      		<li><a href="/">首页</a></li>
+      		
+      		    
+                <li><a href="/nodejs">Node.js</a></li>
+                
+                    <li><a href="/nodejs/npm">包、应用</a></li>
+                
+              
+      		
+      	
+      </ul>
+ </div>
+         <div class="row">
+              <div id="leftcol" class="col-sm-8 col-md-8">
+                 <h1>Sequelize 中文API文档－3. 模型（表）之间的关系/关联</h1>
+                   <p><i class="fa fa-clock-o" title="发布时间"></i>&nbsp;2016年05月22日
+                   &nbsp;&nbsp;
+                   <i class="fa fa-eye" title="阅读"></i>
+                   31835
+                   &nbsp;&nbsp;
+                   <span data-toggle="tooltip" title="声明：本站文章及示例基于特定的环境或软件版本，本站不为因参考本站文章引起的错误或损失负责。在使用前请自行验证是否可用于实际环境。如有纰漏或错误，欢迎进群指正、交流。"><i class="fa fa-exclamation-circle"></i>&nbsp;声明</span>
+                  </p>
+                   <article class="post">
+                        <div class="post_content">
+                        
+                        
+<p><br /></p>
+<p>模型（<code>Model</code>）之间存在各种各样的关系，如：一对一(One-To-One ）、一对多（One-To-Many）等。模型间的关系本质上是对其代表的数据库中表之间的关系描述，通过这些关系可以实现数据库中表之间主/外键约束的创建。查询时也可以基于这些关系，生成在数据库中执行的连接查询或复合查询SQL语句。</p>
+<ol>
+	<li><a href="#associations">关系/关联的使用</a>
+  <ul>
+    <li><a href="#associations-one-to-one">1.1 一对一(One-To-One)关联</a></li>
+    <li><a href="#associations-one-to-many">1.2 一对多(One-To-Many)关联</a></li>
+    <li><a href="#associations-many-to-many">1.3 多对多(Belongs-To-Many)关联</a></li>
+    <li><a href="#associations-scopes">1.4 Scopes - 作用域</a></li>
+    <li><a href="#associations-naming">1.5 命名策略</a></li>
+    <li><a href="#associations-associating-objects">1.6 关联对象</a></li>
+    <li><a href="#associations-associating-check">1.7 关系检查</a></li>
+    <li><a href="#associations-creating-associations">1.8 通过关联创建实例</a></li>
+  </ul>
+  </li>
+  <li><a href="#api">关系/关联相关的API</a>
+  <ul>
+    <li><a href="#api-mixin">2.1 综合介绍</a></li>
+    <li><a href="#api-hasOne">2.2 <code>Model.hasOne()</code> － 拥有一个</a></li>
+    <li><a href="#api-belongsTo">2.3 <code>Model.belongsTo()</code> － 属于</a></li>
+    <li><a href="#api-hasMany">2.4 <code>Model.hasMany()</code> － 拥有多个</a></li>
+    <li><a href="#api-belongsToMany">2.5 <code>Model.belongsToMany()</code> － 多对多</a></li>
+  </ul>
+  </li>
+</ol>
+<h3 id="associations">1. 关系/关联的使用</h3>
+<p>Sequelize 中的模型存在多种关系。在一个<code>User.hasOne(Project)</code>形式的调用中，正在调用的模型<code>User</code>是<code>源模型</code>而做为参数被传入的模型是<code>目标模型</code>。</p>
+<h4 id="associations-one-to-one">1.1 一对一(One-To-One)关联</h4>
+<p>一对一关联是由一个单一的外键，实现两个模型之间的精确关联。</p>
+<p><strong>BelongsTo - 属于</strong></p>
+<p>BelongsTo关联表示一对一关系的外键存在于<code>源模型</code>。</p>
+<p>如，下例中<code>Player</code>是通过外键关联的<code>Team</code>的一部分：</p>
+<pre>var Player = this.sequelize.define('player', {/* attributes */})
+  , Team  = this.sequelize.define('team', {/* attributes */});
+
+Player.belongsTo(Team); // 会为Player添加一个teamId 属性以保持与Team 主键的关系</pre>
+<p><strong>外键</strong></p>
+<p>默认情况下，一个属于关系的外键将从目标模型的名称和主键名称生成。</p>
+<p>默认命名使用<code>驼峰式命名</code>，而在源模型中添加了<code>underscored: true</code>配置，将使用<code>蛇型命名</code>。</p>
+<pre>var User = this.sequelize.define('user', {/* attributes */})
+  , Company  = this.sequelize.define('company', {/* attributes */});
+
+User.belongsTo(Company); // 会为user 添加 companyId 属性
+
+var User = this.sequelize.define('user', {/* attributes */}, {underscored: true})
+  , Company  = this.sequelize.define('company', {
+    uuid: {
+      type: Sequelize.UUID,
+      primaryKey: true
+    }
+  });
+
+User.belongsTo(Company); // 会为user 添加 company_uuid 属性 </pre>
+<p>在定义中使用<code>as</code>命名时，会将其做为目标模型的名称：</p>
+<pre>var User = this.sequelize.define('user', {/* attributes */})
+  , UserRole  = this.sequelize.define('userRole', {/* attributes */});
+
+User.belongsTo(UserRole, {as: 'role'}); // 会为 user添加 roleId 属性而不是 userRoleId</pre>
+<p>在任命情况下，使用使用了<code>foreignKey</code>选项，外键名都会使用此选项值。我可以在Sequelize 中像下面这样使用外键：</p>
+<pre>var User = this.sequelize.define('user', {/* attributes */})
+  , Company  = this.sequelize.define('company', {/* attributes */});
+
+User.belongsTo(Company, {foreignKey: 'fk_company'}); // 为User 添加fk_company 外键</pre>
+<p><strong>目标键</strong></p>
+<p>目标键是位于目标模型上通过源模型外键列指向的列。默认情况下，目标键是会<code>belongsTo</code>关系中目标模型的主键。要使用自定义列，请用<code>targetKey</code>选项来指定：</p>
+<pre>var User = this.sequelize.define('user', {/* attributes */})
+  , Company  = this.sequelize.define('company', {/* attributes */});
+
+User.belongsTo(Company, {foreignKey: 'fk_companyname', targetKey: 'name'}); // 为User 添加 fk_companyname 目标键</pre>
+<p><strong>HasOne - 拥有一个</strong></p>
+<p>HasOne关联表示一对一关系的外键存在于<code>目标模型</code>。</p>
+<pre>var User = sequelize.define('user', {/* ... */})
+var Project = sequelize.define('project', {/* ... */})
+ 
+// hasOne 关系
+Project.hasOne(User)
+
+/*
+  在这个示例中，hasOne会添加一个projectId 属性到User模型中
+  另外，Project.prototype 中会增加根据传入的第一个定义参数生成的访问器方法 getUser 和 setUser 置。
+  如果启用了underscore 设置，添加的属性会是 project_id 而不是 projectId.
+
+  外键会存在于users 表中
+
+  你同样可以自定义外键，如：你想使用一个已存在数据库:
+*/
+ 
+Project.hasOne(User, { foreignKey: 'initiator_id' })
+ 
+/*
+  因为 Sequelize 会访问器使用模型名（定义时的第一个参数）,
+  如果不使用这个名称，可以在hasOne 的选项中指定:
+*/
+ 
+Project.hasOne(User, { as: 'Initiator' })
+// 这时会有 Project#getInitiator 和 Project#setInitiator
+ 
+// 或者可以定义一些自引用
+var Person = sequelize.define('person', { /* ... */})
+ 
+Person.hasOne(Person, {as: 'Father'})
+// 会为Person 增加一个FatherId 属性
+// 同样可以自定义外键：
+Person.hasOne(Person, {as: 'Father', foreignKey: 'DadId'})
+// 会为Person 增加一个 DadId 属性
+ 
+// 这两种情况下都会有以下两个方法:
+Person#setFather
+Person#getFather
+ 
+// 如果想对一个表做两次连接查询:
+Team.hasOne(Game, {as: 'HomeTeam', foreignKey : 'homeTeamId'});
+Team.hasOne(Game, {as: 'AwayTeam', foreignKey : 'awayTeamId'});
+
+Game.belongsTo(Team);</pre>
+<p>虽然被称为HasOne 关联，但大多数 1:1关系中通常会使用BelongsTo 关联，因为BelongsTo 会在源模型中添加外键，而HasOne 则会在目标模型中添加外键。</p>
+<p><strong>HasOne 与BelongsTo 的不同</strong></p>
+<p>在1:1 的关系中，可使用HasOne 或BelongsTo来定义。但它们的使用场景有所不同，下面通过一个例子来说明。</p>
+<p>我们有两张表，会别关联到<code>Player</code> 和<code>Team</code>模型，定义如下：</p>
+<pre>var Player = this.sequelize.define('player', {/* attributes */})
+  , Team  = this.sequelize.define('team', {/* attributes */});</pre>
+<p>在Sequelize 中我们可以<code>源</code>和<code>目标</code>模型的形式将二者建立联系。如将<code>Player</code> 做为<code>源模型</code>，而将<code>Team</code>做为<code>目标模型</code>：</p>
+<pre>Player.belongsTo(Team);
+//Or
+Player.hasOne(Team);</pre>
+<p>或<code>Team</code> 做为<code>源模型</code>，而将<code>Player</code>做为<code>目标模型</code>：</p>
+<pre>Team.belongsTo(Player);
+//Or
+Team.hasOne(Player);</pre>
+<p>HasOne 和 BelongsTo 插入外键的位置有所不同。HasOne 会向<code>目标模型</code>中插入关联键，而BelongsTo 会向<code>源模型</code>中插入关联键。</p>
+<p>一个演示HasOne 和 BelongsTo使用的示例：</p>
+<pre>var Player = this.sequelize.define('player', {/* attributes */})
+  , Coach  = this.sequelize.define('coach', {/* attributes */})
+  , Team  = this.sequelize.define('team', {/* attributes */});</pre>
+<p>假设<code>Player</code>模型通过<code>teamId</code>列与其团队建立联系，每个团队的教练<code>Coach</code>信息通过<code>coachId</code>列存储。在这些 1:1 场景中需要以不同的方式建立关系，因为模型外键的存储位置不同。</p>
+<p>当信息关联是存在于当前<code>源模型</code>时，我们可以使用<code>belongsTo</code>。在上面示例中，<code>Player</code>适合使用<code>belongsTo</code>，因为它有<code>teamId</code>列。</p>
+<pre>Player.belongsTo(Team)  // `teamId` 会添加到 Player / 源模型</pre>
+<p>当信息关联是存在于当前<code>目标模型</code>时，我们可以使用<code>hasOne</code>。在上面示例中，<code>Coach</code>适合使用<code>hasOne</code>，因为<code>model</code>模型中存储了它的<code>Coach</code>信息的<code>coachId</code>字段。</p>
+<pre>Coach.hasOne(Team)  // `coachId` 会添加到 Team / 目标模型</pre>
+<p><br /></p>
+<h4 id="associations-one-to-many">1.2 一对多(One-To-Many)关联</h4>
+<p>One-To-Many关联是指一个<code>源模型</code>连接多个<code>目标模型</code>。反之目标模型都会有一个明确的源。</p>
+<pre>var User = sequelize.define('user', {/* ... */})
+var Project = sequelize.define('project', {/* ... */})
+ 
+// 定义 hasMany 关联
+Project.hasMany(User, {as: 'Workers'})</pre>
+<p>会向 User 中添加一个<code>projectId</code>或<code>project_id</code>属性。Project 的实例中会有访问器<code>getWorkers</code> 和 <code>setWorkers</code>。这是一种单向关联方式，如果两个模型间还有其它关联方式请参考下面的多对多关系。</p>
+<p><br /></p>
+<h4 id="associations-many-to-many">1.3 多对多(Belongs-To-Many)关联</h4>
+<p>Belongs-To-Many 关联是指一个<code>源模型</code>连接多个<code>目标模型</code>。而且，目标模型也可以有多个相关的源。</p>
+<pre>Project.belongsToMany(User, {through: 'UserProject'});
+User.belongsToMany(Project, {through: 'UserProject'});</pre>
+<p>这会创建一个新模型<code>UserProject</code>其中会<code>projectId</code>和<code>userId</code>两个外键。是否使用驼峰命名取决与相关联的两个表。</p>
+<p>定义<code>through</code>选项后，Sequelize会尝试自动生成名字，但并一定符合逻辑。</p>
+<p>在本例中，会为<code>User</code>添加方法 <code>getUsers</code>, <code>setUsers</code>, <code>addUser</code>,<code>addUsers</code> to <code>Project</code>, and <code>getProjects</code>, <code>setProjects</code>, <code>addProject</code>, and <code>addProjects</code> </p>
+<p>有时我们会对连接的模型进行重命名，同样可以使用<code>as</code>实现。如，将User 命名为Workers ，将Project 命名为 Tasks：</p>
+<pre>User.belongsToMany(Project, { as: 'Tasks', through: 'worker_tasks', foreignKey: 'userId' })
+Project.belongsToMany(User, { as: 'Workers', through: 'worker_tasks', foreignKey: 'projectId' })</pre>
+<p><code>foreignKey</code>让你可以设置<code>through</code>关系中的<code>源模型</code>，而<code>otherKey</code>让你可以<code>through</code>关系中的<code>目标模型</code>。</p>
+<pre>User.belongsToMany(Project, { as: 'Tasks', through: 'worker_tasks', foreignKey: 'userId', otherKey: 'projectId'})</pre>
+<p><code>belongsToMany</code>同样可以用来定义自连接：</p>
+<pre>Person.belongsToMany(Person, { as: 'Children', through: 'PersonChildren' })
+// 这会创建 PersonChildren 表，其中存储了对象的 id</pre>
+<p>如果想为连接表添加更多属性，可以建立关联前在sequelize 中为连接表定义一个模型，这会告诉sequelize 使用这个表建立关联而不是创建新表：</p>
+<pre>User = sequelize.define('user', {})
+Project = sequelize.define('project', {})
+UserProjects = sequelize.define('userProjects', {
+    status: DataTypes.STRING
+})
+ 
+User.belongsToMany(Project, { through: UserProjects })
+Project.belongsToMany(User, { through: UserProjects })</pre>
+<p>要为user 添加一个新的project 并设置状态，可以在设置器中传入一个额外的对象，这个属性会包含在连接表中：</p>
+<pre>user.addProject(project, { status: 'started' })</pre>
+<p>默认情况下会向UserProjects表中添加projectId 和 userId，并移除之前已定义的主键属性表并由两个表的主键组建唯一标识，且没有额外的PK 列。要强制为<code>UserProjects</code>添加主键可以手工添加：</p>
+<pre>UserProjects = sequelize.define('userProjects', {
+  id: {
+    type: Sequelize.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  status: DataTypes.STRING
+})</pre>
+<p>Belongs-To-Many 可以基于<code>through</code>关系查询并可以选择查询属性：</p>
+<pre>User.findAll({
+  include: [{
+    model: Project,
+    through: {
+      attributes: ['createdAt', 'startedAt', 'finishedAt'],
+      where: {completed: true}
+    }
+  }]
+});</pre>
+<p><br /></p>
+<h4 id="associations-scopes">1.4 Scopes - 作用域</h4>
+<p>关系作用域允许你设置一个作用范围（一组用于设置和创建的默认属性）。作用域同样也以放在通过 n:m 建立关系的表的关联模型（关联目标）中。</p>
+<p><strong>1:m</strong></p>
+<p>假设有Comment, Post 和 Image三个表，Comment表可以通过<code>commentable_id</code>和<code>commentable</code>字段分别关联image 或 post 表关联：</p>
+<pre>this.Comment = this.sequelize.define('comment', {
+  title: Sequelize.STRING,
+  commentable: Sequelize.STRING,
+  commentable_id: Sequelize.INTEGER
+}, {
+  instanceMethods: {
+    getItem: function() {
+      return this['get' + this.get('commentable').substr(0, 1).toUpperCase() + this.get('commentable').substr(1)]();
+    }
+  }
+});
+
+this.Post.hasMany(this.Comment, {
+  foreignKey: 'commentable_id',
+  constraints: false,
+  scope: {
+    commentable: 'post'
+  }
+});
+this.Comment.belongsTo(this.Post, {
+  foreignKey: 'commentable_id',
+  constraints: false,
+  as: 'post'
+});
+
+this.Image.hasMany(this.Comment, {
+  foreignKey: 'commentable_id',
+  constraints: false,
+  scope: {
+    commentable: 'image'
+  }
+});
+this.Comment.belongsTo(this.Image, {
+  foreignKey: 'commentable_id',
+  constraints: false,
+  as: 'image'
+});</pre>
+<p><code>constraints: false</code>禁止了引用限制-因为<code>commentable_id</code>列会引用多个表，所以不能添加<code>REFERENCES</code>选项限制它。注意，这样就为Image -> Comment 和 Post -> Comment之间关系定义了一个作用域，<code>commentable:'image'</code>和<code>commentable:'post'</code>分别对应了不同的表。这个作用域会自动应用到关联函数中：</p>
+<pre>image.getComments()
+SELECT * FROM comments WHERE commentable_id = 42 AND commentable = 'image';
+
+image.createComment({
+  title: 'Awesome!'
+})
+INSERT INTO comments (title, commentable_id, commentable) VALUES ('Awesome!', 42, 'image');
+
+image.addComment(comment);
+UPDATE comments SET commentable_id = 42, commentable = 'image'</pre>
+<p>而Comment模型的工具函数<code>getItem</code> 会根据<code>commentable</code>的不同而进行简单的转换为<code>getImage</code>或<code>getPost</code>。</p>
+<p><strong>n:m</strong></p>
+<p>继续使用多态模型，一个标签(tag)表－一个项目(item)可以有多个标签，而一个标签也可以属于多个项目。</p>
+<p>下面是一个简单示例，一个Post模型和Tag模型，而现实中标签往往被关联到多个其它模型：</p>
+<pre>ItemTag = sequelize.define('item_tag', {
+  tag_id: {
+    type: DataTypes.INTEGER,
+    unique: 'item_tag_taggable'
+  },
+  taggable: {
+    type: DataTypes.STRING,
+    unique: 'item_tag_taggable'
+  },
+  taggable_id: {
+    type: DataTypes.INTEGER,
+    unique: 'item_tag_taggable',
+    references: null
+  }
+});
+Tag = sequelize.define('tag', {
+  name: DataTypes.STRING
+});
+
+Post.belongsToMany(Tag, {
+  through: {
+    model: ItemTag,
+    unique: false,
+    scope: {
+      taggable: 'post'
+    }
+  },
+  foreignKey: 'taggable_id',
+  constraints: false
+});
+Tag.belongsToMany(Post, {
+  through: {
+    model: ItemTag,
+    unique: false
+  },
+  foreignKey: 'tag_id'
+});</pre>
+<p>作用范围列(<code>taggable</code>)实关联到了<code>through</code>关系模型(<code>ItemTag</code>)。</p>
+<p>我们可以定义一个更严格的关联关系，如为post 应用获取所有<code>pending</code>状态的标签的作用范围：</p>
+<pre>Post.hasMany(Tag, {
+  through: {
+    model: ItemTag,
+    unique: false,
+    scope: {
+      taggable: 'post'
+    }
+  },
+  scope: {
+    status: 'pending'
+  },
+  as: 'pendingTags',
+  foreignKey: 'taggable_id',
+  constraints: false
+});
+
+Post.getPendingTags();</pre>
+<pre>SELECT `tag`.*  INNER JOIN `item_tags` AS `item_tag`
+ON `tag`.`id` = `item_tag`.`tagId`
+  AND `item_tag`.`taggable_id` = 42
+  AND `item_tag`.`taggable` = 'post'
+WHERE (`tag`.`status` = 'pending');</pre>
+<p><br /></p>
+<h4 id="associations-naming">1.5 命名策略</h4>
+<p>默认情况下，Sequelize会使用模型名（名称通过<a href="http://itbilu.com/nodejs/core/VkYIaRPz-.html#api-instance-define" target="_blank">sequelize.define</a>）来识别模型并与其它模型建立关联。如，一个名为<code>user</code>的模型，会向其实例添加<code>get/set/add User</code>等函数，且一个<code>.user</code>属性会在预加载模型中，而对于一个名为<code>User</code>模型来说会添加相同的函数，但预加载中会使用<code>.User</code>属性。</p>
+<p>我在前面介绍过，可以使用<code>as</code>对模型起一个别名。在单一的关系中（hasOne或belongsTo），别名应该使用单数形式，而在多重关系中（hasMany）应该使用复数形式。Sequelize会使用<a href="https://www.npmjs.com/package/inflection" target="_blank">inflection</a>库，对别名的单复数形式进行转换。然而这一转换在非英语单词中可能不适用，这时我们以同时指定单数和复数两个别名：</p>
+<pre>User.belongsToMany(Project, { as: { singular: 'task', plural: 'tasks' }})</pre>
+<p>如果你希望总是使用相同的别名，那么可以定义模型时指定：</p>
+<pre>var Project = sequelize.define('project', attributes, {
+  name: {
+    singular: 'task',
+    plural: 'tasks',
+  }
+})
+ 
+User.belongsToMany(Project);</pre>
+<p>会向 user 实例中添加<code>add/set/get Tasks</code>等函数。</p>
+<p><em>请注意</em>使用<code>as</code>指定别名后，同时也会改变关联的外键列，比较保险的做法是同时指定外键列：</p>
+<pre>Invoice.belongsTo(Subscription)
+Subscription.hasMany(Invoice)</pre>
+<p>不使用<code>as</code>时，一般会生成一个<code>subscriptionId</code>的外键，而通过<code>Ivoice.belongsTo(Subscription, { as: 'TheSubscription' })</code>指定别名后，外键会变成<code>theSubscriptionId</code>，这时可以通过<code>foreignKey</code>选项解决这个问题：</p>
+<pre>Invoice.belongsTo(Subscription, , { as: 'TheSubscription', foreignKey: 'subscription_id' })
+Subscription.hasMany(Invoice, { foreignKey: 'subscription_id' )</pre>
+<p><br /></p>
+<h4 id="associations-associating-objects">1.6 关联对象</h4>
+<p>因为Sequelize 做了很多逻辑运算等，你应该在定义完关系后<code>sequelize.sync</code>方法：</p>
+<pre>Project.belongsToMany(Task)
+Task.belongsToMany(Project)
+ 
+Project.create()...
+Task.create()...
+Task.create()...
+ 
+// 保存……然后
+project.setTasks([task1, task2]).then(function() {
+  // saved!
+})
+ 
+// 保存后可以在then 中访问结果
+project.getTasks().then(function(associatedTasks) {
+  // associatedTasks 是一个task 数组 
+})
+ 
+// 同可以在访问器方法中进行筛选
+// 这与传入一个普通这查询方法一样
+project.getTasks({ where: 'id > 10' }).then(function(tasks) {
+  // tasks 中 id 都大于 10 :)
+})
+ 
+// 可以检索相关对象的某些字段.
+project.getTasks({attributes: ['title']}).then(function(tasks) {
+    // 仅返回 "title" 和 "id"字段
+})</pre>
+<p>通过设置(set)方法还可以移除已创建的关系：</p>
+<pre>// 称除与 task1 的关联
+project.setTasks([task2]).then(function(associatedTasks) {
+  // 现在只和 task2 有关系
+})
+ 
+// 移除所有关联
+project.setTasks([]).then(function(associatedTasks) {
+  // 现在返回一个空数组
+})
+ 
+// 或者直接删除
+project.removeTask(task1).then(function() {
+  // it's gone
+})
+ 
+// 也可以重新添加
+project.addTask(task1).then(function() {
+  // it's back again
+})</pre>
+<p>也可像下面这样移除：</p>
+<pre>// project 与task1 和 task2有关系
+task2.setProject(null).then(function() {
+  // and it's gone
+})</pre>
+<p>hasOne/belongsTo中同样适用：</p>
+<pre>Task.hasOne(User, {as: "Author"})
+Task.setAuthor(anAuthor)</pre>
+<p>在自定义表连接中，可以通过两种方法添加关联关系：</p>
+<pre>// 在创建该关联之前，将属性添加到对象的连接表模型名称中
+project.UserProjects = {
+  status: 'active'
+}
+u.addProject(project)
+ 
+// 或者，通过在添加关联时提供一个额外的参数，其中包含在联接表中的数据
+u.addProject(project, { status: 'active' })
+ 
+ 
+// 当关联多个对象时，同样可以使用上面两种方法
+// 在本例中，提供一个包含在联接表中的数据额外的参数
+project1.UserProjects = {
+    status: 'inactive'
+}
+ 
+u.setProjects([project1, project2], { status: 'active' })</pre>
+<p>当获取自定义连接表的关联数据时，连接表会做为一个DAO 实例返回：</p>
+<pre>u.getProjects().then(function(projects) {
+  var project = projects[0]
+ 
+  if (project.UserProjects.status === 'active') {
+    // .. do magic
+ 
+    // 因为这里是一个真正的 DAO 实例，所以可以直接保存
+    return project.UserProjects.save()
+  }
+})</pre>
+<p>如果只想获取关联表的部分属性，可以提供一个想要获取属性和数组：</p>
+<pre>user.getProjects({ attributes: ['name'], joinTableAttributes: ['status']})</pre>
+<p><br /></p>
+<h4 id="associations-associating-check">1.7 关系检查</h4>
+<p>我们可以检查一对象是否已与另一个对象建立关联，下面是一些检查示例：</p>
+<pre>// 检查对象是否是关联对象之一：
+Project.create({ /* */ }).then(function(project) {
+  return User.create({ /* */ }).then(function(user) {
+    return project.hasUser(user).then(function(result) {
+      // false
+      return project.addUser(user).then(function() {
+        return project.hasUser(user).then(function(result) {
+          // true
+        })
+      })
+    })
+  })
+})
+ 
+// 检查所有对象是符合预期：
+// 假设已有一个 project 和两个 users
+project.setUsers([user1, user2]).then(function() {
+  return project.hasUsers([user1]);
+}).then(function(result) {
+  // false
+  return project.hasUsers([user1, user2]);
+}).then(function(result) {
+  // true
+})</pre>
+<p><br /></p>
+<h4 id="associations-foreign-key">1.8 外键</h4>
+<p>Sequelize中，如果创建了两个模型之间的关联，那么相关联的外键会被自动创建：</p>
+<pre>var Task = this.sequelize.define('task', { title: Sequelize.STRING })
+  , User = this.sequelize.define('user', { username: Sequelize.STRING })
+ 
+User.hasMany(Task)
+Task.belongsTo(User)</pre>
+<p>会生成以下SQL 语句：</p>
+<pre>CREATE TABLE IF NOT EXISTS `User` (
+  `id` INTEGER PRIMARY KEY,
+  `username` VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS `Task` (
+  `id` INTEGER PRIMARY KEY,
+  `title` VARCHAR(255),
+  `user_id` INTEGER REFERENCES `User` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+);</pre>
+<p>task 和 user之间的关系通过task表的外键<code>user_id</code>引入，并<code>REFERENCES</code>引用user表。默认情况下，引用的user 如果被删除那么<code>user_id</code>会被设置为<code>NULL</code>，并且会随user id的更新而更新。这些选项可以在建立关系时通过M<code>onUpdate</code>和<code>onDelete</code>选项修改。可选项有：</p>
+<pre>RESTRICT, CASCADE, NO ACTION, SET DEFAULT, SET NULL</pre>
+<p>对于 1:1 和 1:m 的关系，默认的删除选项是<code>SET NULL</code>，更新选项是<code>CASCADE</code>。而 n:m 的关系，两者都是<code>CASCADE</code>。这意味着，你从 n:m 关系的任一方删除或更新数据，其所对应的关联数据也会同时被删除或更新。</p>
+<p>添加表之间的约束意味着，使用<code>sequelize.sync</code>创建表时，相关的表在数据库中必须有一定创建顺序。如果Task 表引用了User，那么User 必须在Task 之前创建。有时这会导致循环引用，想象一个场景：一个文档和版本，一个文档可以有多个版本，并且为了方便，文档对它的当前版本有一个引用。</p>
+<pre>var Document = this.sequelize.define('document', {
+      author: Sequelize.STRING
+    })
+  , Version = this.sequelize.define('version', {
+      timestamp: Sequelize.DATE
+    })
+
+Document.hasMany(Version) // 添中 document_id 到 version中
+Document.belongsTo(Version, { as: 'Current', foreignKey: 'current_version_id'}) // 添加 current_version_id 到文档中</pre>
+<p>这时可能出现类似以下错误：</p>
+<pre>Cyclic dependency found. 'Document' is dependent of itself. Dependency Chain: Document -> Version => Document</pre>
+<p>为了解决这个问题，可以传入一个<code>constraints: false</code>选项：</p>
+<pre>Document.hasMany(Version)
+Document.belongsTo(Version, { as: 'Current', foreignKey: 'current_version_id', constraints: false})</pre>
+<p>这时会按以下顺序将表同步到数据库中：</p>
+<pre>CREATE TABLE IF NOT EXISTS `Document` (
+  `id` INTEGER PRIMARY KEY,
+  `author` VARCHAR(255),
+  `current_version_id` INTEGER
+);
+CREATE TABLE IF NOT EXISTS `Version` (
+  `id` INTEGER PRIMARY KEY,
+  `timestamp` DATETIME,
+  `document_id` INTEGER REFERENCES `Document` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+);</pre>
+<p><strong>没有约束的外键引用</strong></p>
+<p>有时我们想添加一个外键引用，但不想添加任何约束或关系。这种情形下，你可以在schema定义时手动添加<code>reference</code>属性：</p>
+<pre>var Series, Trainer, Video
+ 
+// 在调用Trainer.hasMany(series)方法的，Series 有一个 trainer_id=Trainer.id 的外键引用
+Series = sequelize.define('series', {
+  title:        DataTypes.STRING,
+  sub_title:    DataTypes.STRING,
+  description:  DataTypes.TEXT,
+ 
+  // Set FK relationship (hasMany) with `Trainer`
+  trainer_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: "trainers",
+      key: "id"
+    }
+  }
+})
+ 
+Trainer = sequelize.define('trainer', {
+  first_name: DataTypes.STRING,
+  last_name:  DataTypes.STRING
+});
+ 
+// 在调用Series.hasOne(Video)后，Video has a series_id=Series.id 的外键引用……
+Video = sequelize.define('video', {
+  title:        DataTypes.STRING,
+  sequence:     DataTypes.INTEGER,
+  description:  DataTypes.TEXT,
+ 
+  // 为`Series`设置 hasOne关系
+  series_id: {
+    type: DataTypes.INTEGER,
+    references: {
+      model: Series, // 可以是一个表示表名的字符串或模型引用
+      key:   "id"
+    }
+  }
+});
+ 
+Series.hasOne(Video);
+Trainer.hasMany(Series);</pre>
+<p><br /></p>
+<h4 id="associations-creating-associations">1.8 通过关联创建实例</h4>
+<p>一个实例可以在一个步骤中创建嵌套关联，且提供所有元素都是新的。</p>
+<p><strong>通过BelongsTo 或HasOne 关系创建实例</strong></p>
+<p>对于如相模型：</p>
+<pre>var Product = this.sequelize.define('product', {
+  title: Sequelize.STRING
+});
+var User = this.sequelize.define('user', {
+  first_name: Sequelize.STRING,
+  last_name: Sequelize.STRING
+});
+
+Product.belongsTo(User);
+// `hasOne`同样适用</pre>
+<p>一个<code>Product</code>和<code>User</code>在同一步中被创建：</p>
+<pre>return Product.create({
+  title: 'Chair',
+  User: {
+    first_name: 'Mick',
+    last_name: 'Broadstone'
+  }
+}, {
+  include: [ User ]
+});</pre>
+<p><strong>通过BelongsTo 关系的别名创建</strong></p>
+<pre>var Creator = Product.belongsTo(User, {as: 'creator'});
+
+return Product.create({
+  title: 'Chair',
+  creator: {
+    first_name: 'Matt',
+    last_name: 'Hansen'
+  }
+}, {
+  include: [ Creator ]
+});</pre>
+<p><strong>通过HasMany 或BelongsToMany 关系创建实例</strong></p>
+<p>对于以下关系的模型：</p>
+<pre>var Tag = this.sequelize.define('tag', {
+  name: Sequelize.STRING
+});
+
+Product.hasMany(Tag); // `belongsToMany` 同样适用</pre>
+<p>现在我们可以创建一个project 同时创建多个相关联的tag：</p>
+<pre>Product.create({
+  id: 1,
+  title: 'Chair',
+  Tags: [
+    { name: 'Alpha'},
+    { name: 'Beta'}
+  ]
+}, {
+  include: [ Tag ]
+})</pre>
+<p>在使用别名时也可以使用：</p>
+<pre>var Categories = Product.hasMany(Tag, {as: 'categories'});
+
+Product.create({
+  id: 1,
+  title: 'Chair',
+  categories: [
+    {id: 1, name: 'Alpha'},
+    {id: 2, name: 'Beta'}
+  ]
+}, {
+  include: [{
+    model: Categories,
+    as: 'categories'
+  }]
+})</pre>
+<p><br /></p>
+<h3 id="api">2. 关系/关联相关的API</h3>
+<h4 id="api-mixin">2.1 综合介绍</h4>
+<p>在Sequelize中创建关联通过调用模型（<code>源</code>）的 belongsTo / hasOne / hasMany / belongsToMany方法完成，并且为这个方法第一个参数提供另一个模型（<code>目标</code>）。各种方法以下规则创建关联：</p>
+<ul>
+<li><code>hasOne</code> - 添加外键到目标模型，并以单数关系混入到源模型</li>
+<li><code>belongsTo</code> - 为当前模型添加外键，并以单数关系混入到源模型</li>
+<li><code>hasMany</code> - 添加外键到目标模型，并以复数关系混入到源模型</li>
+<li><code>belongsToMany</code> - 为连接的表创建<code>N:M</code>关系并以复数关系混入到源模型。会通过<code>sourceId</code>和<code>targetId</code>创建交叉表。</li>
+</ul>
+<p>在创建关系时，可以通过<code>as</code>选项指定别名。这在对一模型引用两次，或者对关联模型使用定义之外的名称时非常有用。</p>
+<pre>User.hasMany(Picture)
+User.belongsTo(Picture, { as: 'ProfilePicture', constraints: false })
+
+user.getPictures() // 获取所有图片
+user.getProfilePicture() // 仅获取主图
+
+User.findAll({
+  where: ...,
+  include: [
+    { model: Picture }, // 加载所有图片
+    { model: Picture, as: 'ProfilePicture' }, // 加载主图，名称拼写必须与关联关系中命名相同
+  ]
+})</pre>
+<p>要完全控制通过Sequlize 添加的外键列，可以使用<code>foreignKey</code>选项。选项值可以是表示名称的字符串或类似使用<code>sequelize.define</code>进行模型定义时对象。</p>
+<pre>User.hasMany(Picture, { foreignKey: 'uid' })</pre>
+<p>这样外键列会使用<code>uid</code>代替默认的<code>userId</code>。</p>
+<pre>User.hasMany(Picture, {
+  foreignKey: {
+    name: 'uid',
+    allowNull: false
+  }
+})</pre>
+<p>指定<code>uid</code>列不能为<code>NULL</code>。在大多数情况下，这将覆盖的外键约束，这sequelize自动创建的，这在外键禁用时非常有用。</p>
+<p>当匹配关联模型时，可限制只匹配部分模型。这些查询条件与在<code>find/findAll</code>中的使用方式相同。如，只查找'jpg'格式的图片：</p>
+<pre>user.getPictures({
+  where: {
+    format: 'jpg'
+  }
+})</pre>
+<p><br /></p>
+<h4 id="api-hasOne">2.2 <code>Model.hasOne()</code> － 拥有一个</h4>
+<pre>Model.hasOne(target, [options])</pre>
+<p>创建当前模型（源）到目标模型之间的关系，外键会被添加到目标模型中。</p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>target</td>
+<td>Model</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.hooks=false]</td>
+<td>boolean</td>
+<td>设置为 true 时，会在关联模型删除时执行 before-/afterDestroy 钩子方法</td>
+</tr>
+<tr>
+<td>[options.as]</td>
+<td>string</td>
+<td>当前模型（源）的别名，单数形式。如果你为一个表创建多次关联，或者不想使用定义模型时使用的名称，那么就应该为模型指定一个别名。</td>
+</tr>
+<tr>
+<td>[options.foreignKey]</td>
+<td>string | object</td>
+<td>目标表中的外键名或相当于定义外键列的对象 (语法参考 <code>Sequelize.define</code> )。使用对象时，应该添加一个<code>name</code>来设置列名。默认的外键命名规为源模型名+源模型主键名</td>
+</tr>
+<tr>
+<td>[options.onDelete='SET&nbsp;NULL | CASCADE']</td>
+<td>string</td>
+<td>如果外允许空则 SET NULL，其它则 CASCADE</td>
+</tr>
+<tr>
+<td>[options.onUpdate='CASCADE']</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.constraints=true]</td>
+<td>boolean</td>
+<td>是否在删除或更新时启用外键约束</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-belongsTo">2.3 <code>Model.belongsTo()</code> － 属于</h4>
+<pre>Model.belongsTo(target, [options])</pre>
+<p>创建当前模型（源）到目标模型之间的关系，外键会被添加到源模型中。</p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>target</td>
+<td>Model</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.hooks=false]</td>
+<td>boolean</td>
+<td>设置为 true 时，会在关联模型删除时执行 before-/afterDestroy 钩子方法</td>
+</tr>
+<tr>
+<td>[options.as]</td>
+<td>string</td>
+<td>当前模型（源）的别名，单数形式。如果你为一个表创建多次关联，或者不想使用定义模型时使用的名称，那么就应该为模型指定一个别名。</td>
+</tr>
+<tr>
+<td>[options.foreignKey]</td>
+<td>string | object</td>
+<td>目标表中的外键名或相当于定义外键列的对象 (语法参考 <code>Sequelize.define</code> )。使用对象时，应该添加一个<code>name</code>来设置列名。默认的外键命名规为源模型名+源模型主键名</td>
+</tr>
+<tr>
+<td>[options.scope]</td>
+<td>object</td>
+<td>键/值 集合，用于目标的创建和查找操作(sqlite 不支持 N:M)</td>
+</tr>
+<tr>
+<td>[options.onDelete='SET&nbsp;NULL | NO&nbsp;ACTION']</td>
+<td>string</td>
+<td>如果外允许空则 SET NULL，其它则 CASCADE</td>
+</tr>
+<tr>
+<td>[options.onUpdate='CASCADE']</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.constraints=true]</td>
+<td>boolean</td>
+<td>是否在删除或更新时启用外键约束</td>
+</tr>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-hasMany">2.4 <code>Model.hasMany()</code> － 拥有多个</h4>
+<pre>Model.hasMany(target, [options])</pre>
+<p>创建当前模型（源）到目标模型之间的 1:m 的关系，外键会被添加到目标模型中。</p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>target</td>
+<td>Model</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.hooks=false]</td>
+<td>boolean</td>
+<td>设置为 true 时，会在关联模型删除时执行 before-/afterDestroy 钩子方法</td>
+</tr>
+<tr>
+<td>[options.as]</td>
+<td>string</td>
+<td>当前模型（源）的别名，单数形式。如果你为一个表创建多次关联，或者不想使用定义模型时使用的名称，那么就应该为模型指定一个别名。</td>
+</tr>
+<tr>
+<td>[options.foreignKey]</td>
+<td>string | object</td>
+<td>目标表中的外键名或相当于定义外键列的对象 (语法参考 <code>Sequelize.define</code> )。使用对象时，应该添加一个<code>name</code>来设置列名。默认的外键命名规为源模型名+源模型主键名</td>
+</tr>
+<tr>
+<td>[options.targetKey]</td>
+<td>string</td>
+<td>用于关联目标表的字段名。默认为目标表的主键。</td>
+</tr>
+<tr>
+<td>[options.onDelete='SET&nbsp;NULL | NO&nbsp;ACTION']</td>
+<td>string</td>
+<td>如果外允许空则 SET NULL，其它则 CASCADE</td>
+</tr>
+<tr>
+<td>[options.onUpdate='CASCADE']</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.constraints=true]</td>
+<td>boolean</td>
+<td>是否在删除或更新时启用外键约束</td>
+</tr>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-belongsToMany">2.5 <code>Model.belongsToMany()</code> － 多对多</h4>
+<pre>Model.belongsToMany(target, [options])</pre>
+<p>创建连接表的 N:M 的关系</p>
+<pre>User.belongsToMany(Project, { through: 'UserProjects' })
+Project.belongsToMany(User, { through: 'UserProjects' })</pre>
+<p>定义中指定需要<code>through</code>时，sequelize会尝试自动生成名字，但生成的名字并不一定符合逻辑。</p>
+<p>你通过自定义属性定义一个模型，它的属性可以用两种方式添加/设置关联。</p>
+<pre>var UserProjects = sequelize.define('UserProjects', {
+  started: Sequelize.BOOLEAN
+})
+User.belongsToMany(Project, { through: UserProjects })
+Project.belongsToMany(User, { through: UserProjects })</pre>
+<pre>jan.addProject(homework, { started: false }) // homework 工程还未开始
+jan.setProjects([makedinner, doshopping], { started: true}) // shopping和dinner 两种方式都会启动
+</pre>
+<p>如果你想设置多个目标实例，但是有不同的属性，这时必须在实例上设置属性：</p>
+<pre>p1.UserProjects = {
+  started: true
+}
+user.setProjects([p1, p2], {started: false}) </pre>
+<p>类似的，使用自定义属性连接表时，这些属性将做为一个对象的名称：</p>
+<pre>user.getProjects().then(function (projects) {
+  var p1 = projects[0]
+  p1.UserProjects.started // Is this project started yet?
+})</pre>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>target</td>
+<td>Model</td>
+<td></td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.hooks=false]</td>
+<td>boolean</td>
+<td>设置为 true 时，会在关联模型删除时执行 before-/afterDestroy 钩子方法</td>
+</tr>
+<tr>
+<td>[options.through]</td>
+<td>Model | string | object</td>
+<td>在N:M 的关联中，用于连接源 和 目标 表的名称</td>
+</tr>
+<td>[options.through.model]</td>
+<td>Model</td>
+<td>用于连接 N:M 关系的模型</td>
+</tr>
+<td>[options.through.scope]</td>
+<td>object</td>
+<td>用于建立关联的键/值集合，并通过模型查找默认值。</td>
+</tr>
+<td>[options.through<br/>.unique=true]</td>
+<td>boolean </td>
+<td>设置为 true时，唯一键会从使用的外键中生成</td>
+</tr>
+<td>[options.as]</td>
+<td>string</td>
+<td>当前模型（源）的别名，单数形式。如果你为一个表创建多次关联，或者不想使用定义模型时使用的名称，那么就应该为模型指定一个别名。</td>
+</tr>
+<tr>
+<td>[options.foreignKey]</td>
+<td>string | object</td>
+<td>目标表中的外键名或相当于定义外键列的对象 (语法参考 <code>Sequelize.define</code> )。使用对象时，应该添加一个<code>name</code>来设置列名。默认的外键命名规为源模型名+源模型主键名</td>
+</tr>
+<tr>
+<td>[options.otherKey]</td>
+<td>string | object</td>
+<td>连接表的外键名称（表示目标模型）或表示其它列的类型定义（见<code>sequelize.define</code>语法）。使用对象时，可以添加一个name 属性以设置目标列，默认为 目标模型名称 + 目标主键的名称</td>
+</tr>
+<tr>
+<td>[options.onDelete='SET&nbsp;NULL | NO&nbsp;ACTION']</td>
+<td>string</td>
+<td>如果外允许空则 SET NULL，其它则 CASCADE</td>
+</tr>
+<tr>
+<td>[options.onUpdate='CASCADE']</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.constraints=true]</td>
+<td>boolean</td>
+<td>是否在删除或更新时启用外键约束</td>
+</tr>
+</tr>
+</tbody>
+</table>
+                        </div>
+                   </article>
+                   <div>
+
+	<p>下一篇：<a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a>
+
+
+	<p>上一篇：<a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定义、使用与Model类的API</a>
+
+</div>
+              </div>
+
+              <div id="sidebar" class="col-sm-4 col-md-4">
+                  <aside class="widget">
+    <form method="post" action="/search" class="form-horizontal">
+    <div class="form-group">
+        <div class="col-sm-9">
+            <input placeholder="关键字" name="keyword" class="form-control" type="text"  >
+        </div>
+        <div class="col-sm-3">
+            <button type="submit" class="btn btn-default">&nbsp;&nbsp;搜索&nbsp;&nbsp;</button>
+        </div>
+    </div>
+    </form>
+</aside>
+                  
+<aside class="widget">
+    <h4>文章分类</h4>
+    <ul class="grove-list">
+    
+    	
+    		<li><a href="/nodejs/core">基础、核心、API</a></li>
+    	
+    
+    	
+    		<li class="active"><a href="#">包、应用</a></li>
+    	
+    
+    </ul>
+</aside>
+
+                  
+<aside class="widget">
+    <h4>阅读排行</h4>
+    <ul class="grove-list">
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VkYIaRPz-.html">Sequelize 中文API文档－1. 快速入门、Seq...</a> (111793)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定...</a> (111550)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a> (36951)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/linux/management/NymXRUieg.html">解决类似 /usr/lib64/libstdc++.so....</a> (36371)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的...</a> (31834)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/EkwKysXIl.html">HTTP请求方法：GET、HEAD、POST、PUT、DE...</a> (14940)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/javascript/js/41KMSZ9a.html">［ES6］Promise对象Promise.all()方法...</a> (13937)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/N1sdaHTzb.html">Sequelize 中文API文档－5. 实例的使用、In...</a> (13690)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJHw6ScNb.html">bluebird与原生Promise对象及bluebird...</a> (12755)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/database/mongo/E1tWQz4_e.html">MongoDB索引管理－索引的创建、查看、删除</a> (12430)</h5>
+         </li>
+        
+    </ul>
+</aside>
+
+                  <aside class="widget">
+    <h4>最新文章</h4>
+    <ul class="grove-list">
+    
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/core/Sy-2trZhQ.html">Node.js 的 Http/2 模块</a></h5>
+              <p><code>http2</code>模块是自Node.js<code>v8.4.0</code>起...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/r1IhFZV-X.html">Blockly 创建自定义块-Blockly 开发者工具</a></h5>
+              <p>Blockly Developer Tools 是一个基于Web的开发者工具，它可以通过配置自动化...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/H1huYbEWQ.html">Blockly 创建自定义块-概述</a></h5>
+              <p>将 Blockly 集成到应用中后，或多或少总是需要创建一些<code>"块"</code>。本篇...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/S1BhIhdtG.html">Sequelize 嵌套模型查询及嵌套模型字段排序</a></h5>
+              <p>Sequelize 的“嵌套模型查询”最终会生成SQL“连接查询”语句，即生成'inner joi...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/By7L5p3ff.html">gyp 文件输入格式参考</a></h5>
+              <p><code>GYP</code>（node-gyp）基于<code>.gyp</code>文件构建...</p>
+         </li>
+        
+    
+    </ul>
+</aside>
+                  <!-- <aside class="widget">
+    <h4>广告</h4>
+    <p><a href="http://redirect.simba.taobao.com/rd?w=unionnojs&f=http%3A%2F%2Fai.taobao.com%2Fauction%2Fedetail.htm%3Fe%3D80FuZnNB1TS6k0Or%252B%252BH4tPg7Qoo6gIwW72fxp1Fq8BiLltG5xFicOdXrTUTgh9sMDPIwxrc30rhDsYaO8QAt%252FkUldzjpLCiPsn0%252BfXTZJrM4I6TE1Mm7FG3abJM7sDg2X7UB%252FLMklcjcDCUJyXw5Pg%253D%253D%26ptype%3D100010%26from%3Dbasic&k=5ccfdb950740ca16&c=un&b=alimm_0&p=mm_26749822_9476439_31826248" rel="nofollow">一包饼〜〜〜</a></p>
+</aside> -->
+                  
+
+                  <aside class="widget">
+    <h4>交流群：564850876</h4>
+    <p><img src="/img/qq-group.png" alt="交流群：564850876" /></p>
+</aside>
+                  <!-- <aside class="widget last">
+	<h4>友情链接</h4>
+	<ul class="grove-list">
+	     <li><a href="http://www.koocode.com" target="_blank">酷码</a></li>
+	</ul>
+</aside> -->
+              </div>
+         </div>
+    </section>
+</div>
+<script type="text/javascript">
+var xhr = new XMLHttpRequest();
+xhr.open("put", "/nodejs/npm/41qaV3czb.html", true);
+// xhr.onreadystatechange = function() { if (xhr.readyState == 4) {console.log(xhr.responseText);}}
+xhr.send();
+</script>
+<footer>
+<div class="container">
+    <!-- <div class="row info">
+        <div class="col-sm-3 residence">
+        
+        </div>
+        <div class="col-sm-5 touch">
+            <ul>
+                <li><strong></strong></li>
+                <li>email：</strong>cn.liuht@gmail.com</li>
+            </ul>
+        </div>
+    </div> -->
+    <div class="row credits">
+        <div class="col-md-12">
+            <div class="row copyright">
+                <div class="col-md-12">
+                 Copyright ©2015-2017 www.itbilu.com all rights reserved<a href="http://www.miitbeian.gov.cn/" target="_blank">京ICP备11014171号-3</a>
+                </div>
+            </div>
+        </div>            
+    </div>
+</div>
+</footer>
+</div>
+<script type="text/javascript" src="//cdn.itbilu.com/js/main-min.js"></script>
+<script type="text/javascript">
+	$(function () { $("[data-toggle='tooltip']").tooltip(); });
+	
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?2249745ad1ce80c1744fc6aede553fc1";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	 
+	(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+</body>
+</html>

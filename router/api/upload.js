@@ -4,6 +4,7 @@ const multer = require('multer');
 const router = express.Router();
 const upload = multer({ dest: 'public/images' })
 const info = require('../../tool/info.js');
+const config = require('../../config');
 router.get('/', function (req, res, next) {
   res.render('../../views/upload.html');
 })
@@ -19,7 +20,7 @@ router.post('/', upload.array('thumbnail', 5), function (req, res, next) {
       if (err) {
         throw err;
       }
-      res.send(`http://${info.getIP()}:3000/images/${name}${type}`);
+      res.send(`http://${info.getIP()}:${config.project.port}/images/${name}${type}`);
     })
   }
 });

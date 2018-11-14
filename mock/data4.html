@@ -1,0 +1,552 @@
+<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta name="baidu-site-verification" content="O5DO1n0DYd" />
+	<meta name="google-site-verification" content="JpblxCnu30QFTXwwVV3BFBDP9ObDXUOXlhFWiVIYsOo" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="&lt;code&gt;Sequelize&lt;/code&gt;中有两种查询：使用&lt;code&gt;Model&lt;/code&gt;（模型）中的方法查询和使用&lt;code&gt;sequelize.query()&lt;/code&gt;进行基于SQL语句的原始查询。" />
+	<title>Sequelize 中文API文档－4. 查询与原始查询 - IT笔录</title>
+	<link rel="canonical" href="//itbilu.com/nodejs/npm/VJIR1CjMb.html"/>
+	<link rel="icon" href="/img/logo_32X32.ico" type="image/x-icon" />
+	<link href="//cdn.itbilu.com/css/main-min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+     <div class="container">
+          <div class="navbar navbar-default" role="navigation">
+               <div class="navbar-header">
+                    <a class="navbar-brand" href="/"> 
+                         <img src="/img/logo.png" alt="optional logo" height="90" width="90"> 
+                         <span class="logo_title"><strong>IT笔录</strong></span> 
+                         <span class="logo_subtitle">学习，记录，整理</span> 
+                    </a>
+                    <a class="btn btn-navbar btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                         <span class="nb_left pull-left"> 
+                              <span class="fa fa-reorder"></span>
+                         </span>
+                         <span class="nb_right pull-right">menu</span>
+                    </a>
+               </div>
+               <div class="collapse navbar-collapse">
+                    <ul class="nav pull-right navbar-nav">
+                         <li ><a href="/">首页</a></li>
+                         <li  class="active"><a href="/nodejs">Nodejs</a></li>
+                         <li ><a href="/javascript">javaScript</a></li>
+                         <li ><a href="/database">数据库</a></li>
+                         <li ><a href="/linux">Linux</a></li>
+                         <li ><a href="/tools">工具</a></li>
+                         <li ><a href="/other">其它</a></li>
+                    </ul>
+               </div>
+          </div>
+     </div>
+</header>
+<div class="main">
+<div class="container">
+    <section>
+         <div class="row breadcrumb-row">
+      <ul class="breadcrumb">
+      	
+      		<li><a href="/">首页</a></li>
+      		
+      		    
+                <li><a href="/nodejs">Node.js</a></li>
+                
+                    <li><a href="/nodejs/npm">包、应用</a></li>
+                
+              
+      		
+      	
+      </ul>
+ </div>
+         <div class="row">
+              <div id="leftcol" class="col-sm-8 col-md-8">
+                 <h1>Sequelize 中文API文档－4. 查询与原始查询</h1>
+                   <p><i class="fa fa-clock-o" title="发布时间"></i>&nbsp;2016年05月23日
+                   &nbsp;&nbsp;
+                   <i class="fa fa-eye" title="阅读"></i>
+                   36952
+                   &nbsp;&nbsp;
+                   <span data-toggle="tooltip" title="声明：本站文章及示例基于特定的环境或软件版本，本站不为因参考本站文章引起的错误或损失负责。在使用前请自行验证是否可用于实际环境。如有纰漏或错误，欢迎进群指正、交流。"><i class="fa fa-exclamation-circle"></i>&nbsp;声明</span>
+                  </p>
+                   <article class="post">
+                        <div class="post_content">
+                        
+                        
+<p><br /></p>
+<p><code>Sequelize</code>中有两种查询：使用<code>Model</code>（模型）中的方法查询和使用<code>sequelize.query()</code>进行基于SQL语句的原始查询。</p>
+<ol>
+	<li><a href="#model"><code>Model</code>查询</a>
+	<ul>
+		<li><a href="#model-attributes">1.1 Attributes - 属性与查询字段</a></li>
+		<li><a href="#model-attributes">1.2 Where - 指定筛选条件</a></li>
+		<li><a href="#model-pagination">1.3 limit/offset - 分页与限制返回结果数</a></li>
+		<li><a href="#model-order">1.4 查询排序</a></li>
+	</ul>
+	</li>
+	<li><a href="#raw">原始查询</a>
+	<ul>
+		<li><a href="#raw-query">2.1 原始查询方法</a></li>
+		<li><a href="#raw-replacements">2.2 查询参数替换</a></li>
+		<li><a href="#raw-bind">2.3 参数绑定</a></li>
+	</ul>
+	</li>
+</ol>
+<h3 id="model">1. <code>Model</code>查询</h3>
+<p><code>Model</code>是一种表示与数据库中表关系的描述对象，它通过<code>sequlize.define</code>方法定义或通过<code>sequlize.import</code>导入创建实例对象。通过<code>Model</code>进行进行数据查询时，我们可以实现类似在数据库中直接使用SQL语句的查询、排序、分组、别名、连接查询等。</p>
+<h4 id="model-attributes">1.1 Attributes - 属性与查询字段</h4>
+<p>查询时，如果只需要查询模型的部分属性，可以在通过在查询选项中指定<code>attributes</code>实现。该选项是一个数组参数，在数组中指定要查询的属性即可，这些要查询的属性就表示要在数据库查询的字段：</p>
+<pre>Model.findAll({
+  attributes: ['foo', 'bar']
+});</pre>
+<pre>SELECT foo, bar ...</pre>
+<p>查询属性（字段）可以通过传入一个嵌套数据进行重命名：</p>
+<pre>Model.findAll({
+  attributes: ['foo', ['bar', 'baz']]
+});</pre>
+<pre>SELECT foo, bar AS baz ...</pre>
+<p>通过<code>sequelize.fn</code>方法可以进行聚合查询：</p>
+<pre>Model.findAll({
+  attributes: [[sequelize.fn('COUNT', sequelize.col('hats')), 'no_hats']]
+});</pre>
+<pre>SELECT COUNT(hats) AS no_hats ...</pre>
+<p>在使用聚合函数时，要给聚合字段指定一个别名。如，在上例中我们为聚合函数指定了别名<code>'no_hats'</code>，这样我们就能在查询的回调函数实例中通过<code>instance.get('no_hats')</code>来访问聚合统计的结果。</p>
+<p>当需要查询所有字段并对某一字段使用聚合查询时，而只需要以对象的形式传入<code>attributes</code>并添加<code>include</code>子属性即可。</p>
+<pre>// 拽定全查询字段比较麻烦
+Model.findAll({
+  attributes: ['id', 'foo', 'bar', 'baz', 'quz', [sequelize.fn('COUNT', sequelize.col('hats')), 'no_hats']]
+});
+
+// 这样会比较简短，且在你添加/删除属性后不会出错
+Model.findAll({
+  attributes: { include: [[sequelize.fn('COUNT', sequelize.col('hats')), 'no_hats']] }
+});</pre>
+<pre>SELECT id, foo, bar, baz, quz, COUNT(hats) AS no_hats ...</pre>
+<p>全部查询时，可以通过<code>exclude</code>子属性来排除不需要查询的字段：</p>
+<pre>Model.findAll({
+  attributes: { exclude: ['baz'] }
+});</pre>
+<pre>SELECT id, foo, bar, quz ...</pre>
+<p>关于聚合查询，请参考：<a href="http://itbilu.com/nodejs/npm/EJcKjQWfM.html" target="_blank">在Sequelize中使用group by分组聚合查询</a></p>
+<p><br /></p>
+<h4 id="model-attributes">1.2 Where - 指定筛选条件</h4>
+<p>在模型的 find/finAll 或 updates/destroys 操作中，可以指定一个<code>where</code>选项以指定筛选条件，</p>
+<p><code>where</code>是一个包含属性/值对对象，sequelize会根据此对象生产查询语句的筛选条件。</p>
+<p><strong>基本用法</strong></p>
+<pre>Post.findAll({
+  where: {
+    authorId: 2
+  }
+});
+// SELECT * FROM post WHERE authorId = 2
+
+Post.findAll({
+  where: {
+    authorId: 12,
+    status: 'active'
+  }
+});
+// SELECT * FROM post WHERE authorId = 12 AND status = 'active';
+
+Post.destroy({
+  where: {
+    status: 'inactive'
+  }
+});
+// DELETE FROM post WHERE status = 'inactive';
+
+Post.update({
+  updatedAt: null,
+}, {
+  where: {
+    deletedAt: {
+      $ne: null
+    }
+  }
+});
+// UPDATE post SET updatedAt = null WHERE deletedAt NOT NULL;
+
+Post.findAll({
+  where: sequelize.where(sequelize.fn('char_length', sequelize.col('status')), 6)
+});
+// SELECT * FROM post WHERE char_length(status) = 6;</pre>
+<p><strong id="operators">操作符</strong></p>
+<pre>$and: {a: 5}           // AND (a = 5)
+$or: [{a: 5}, {a: 6}]  // (a = 5 OR a = 6)
+$gt: 6,                // > 6
+$gte: 6,               // >= 6
+$lt: 10,               // < 10
+$lte: 10,              // <= 10
+$ne: 20,               // != 20
+$not: true,            // IS NOT TRUE
+$between: [6, 10],     // BETWEEN 6 AND 10
+$notBetween: [11, 15], // NOT BETWEEN 11 AND 15
+$in: [1, 2],           // IN [1, 2]
+$notIn: [1, 2],        // NOT IN [1, 2]
+$like: '%hat',         // LIKE '%hat'
+$notLike: '%hat'       // NOT LIKE '%hat'
+$iLike: '%hat'         // ILIKE '%hat' (case insensitive) (PG only)
+$notILike: '%hat'      // NOT ILIKE '%hat'  (PG only)
+$like: { $any: ['cat', 'hat']}
+                       // LIKE ANY ARRAY['cat', 'hat'] - also works for iLike and notLike
+$overlap: [1, 2]       // && [1, 2] (PG array overlap operator)
+$contains: [1, 2]      // @> [1, 2] (PG array contains operator)
+$contained: [1, 2]     // <@ [1, 2] (PG array contained by operator)
+$any: [2,3]            // ANY ARRAY[2, 3]::INTEGER (PG only)
+
+$col: 'user.organization_id' // = "user"."organization_id", with dialect specific column identifiers, PG in this example</pre>
+<p><strong>组合查询</strong></p>
+<pre>{
+  rank: {
+    $or: {
+      $lt: 1000,
+      $eq: null
+    }
+  }
+}
+// rank < 1000 OR rank IS NULL
+
+{
+  createdAt: {
+    $lt: new Date(),
+    $gt: new Date(new Date() - 24 * 60 * 60 * 1000)
+  }
+}
+// createdAt < [timestamp] AND createdAt > [timestamp]
+
+{
+  $or: [
+    {
+      title: {
+        $like: 'Boat%'
+      }
+    },
+    {
+      description: {
+        $like: '%boat%'
+      }
+    }
+  ]
+}
+// title LIKE 'Boat%' OR description LIKE '%boat%'</pre>
+<p><strong>嵌套对象</strong></p>
+<pre>{
+  meta: {
+    video: {
+      url: {
+        $ne: null
+      }
+    }
+  }
+}</pre>
+<p><strong>嵌套键</strong></p>
+<pre>{
+  "meta.audio.length": {
+    $gt: 20
+  }
+}</pre>
+<p><strong>包含</strong></p>
+<pre>{
+  "meta": {
+    $contains: {
+      site: {
+        url: 'http://itbilu.com'
+      }
+    }
+  }
+}</pre>
+<p><strong>关系/联合</strong></p>
+<pre>// 查询所有至少有一个task的projects，task.state === project.task
+Project.findAll({
+    include: [{
+        model: Task,
+        where: { state: Sequelize.col('project.state') }
+    }]
+})</pre>
+<p><br /></p>
+<h4 id="model-pagination">1.3 limit/offset - 分页与限制返回结果数</h4>
+<p>查询进，我们可以使用<code>limit</code>限制返回结果条数，并可以通过<code>offset</code>来设置查询偏移（跳过）量，通过这两个属性我们可以实现分页查询的功能：</p>
+<pre>// 获取 10 条数据（实例）
+Project.findAll({ limit: 10 })
+
+// 跳过 8 条数据（实例）
+Project.findAll({ offset: 8 })
+
+// 跳过 5 条数据并获取其后的 5 条数据（实例）
+Project.findAll({ offset: 5, limit: 5 })</pre>
+<p><br /></p>
+<h4 id="model-order">1.4 查询排序</h4>
+<p><code>order</code>选项用于查询结果的排序数据。排序时应该传入一个包含属性-排序方向的元组/数组，以保证正确的转义：</p>
+<pre>something.findOne({
+  order: [
+    // 转义 username 并对查询结果按 DESC 方向排序
+    ['username', 'DESC'],
+
+    // 按 max(age) 排序
+    sequelize.fn('max', sequelize.col('age')),
+
+    // 按 max(age) DESC 排序
+    [sequelize.fn('max', sequelize.col('age')), 'DESC'],
+
+    // 按 otherfunction(`col1`, 12, 'lalala') DESC 排序
+    [sequelize.fn('otherfunction', sequelize.col('col1'), 12, 'lalala'), 'DESC'],
+
+    // 按相关联的User 模型的 name 属性排序
+    [User, 'name', 'DESC'],
+
+    // 按相关联的User 模型的 name 属性排序并将模型起别名为 Friend
+    [{model: User, as: 'Friend'}, 'name', 'DESC'],
+
+    // 按相关联的User 模型的嵌套关联的 Company 模型的 name 属性排序
+    [User, Company, 'name', 'DESC'],
+  ]
+  // 以下所有声明方式都会视为字面量，应该小心使用
+  order: 'convert(user_name using gbk)'
+  order: 'username DESC'
+  order: sequelize.literal('convert(user_name using gbk)')
+})</pre>
+<p><br /></p>
+<h3 id="raw">2. 原始查询</h3>
+<p>有时会使用原始查询或执行已准备好的SQL语句，这时可以用Sequlize提供的工具函数<code>sequelize.query</code>来实现。</p>
+<h4 id="raw-query">2.1 原始查询方法</h4>
+<p>默认情况下，该函数会返回两个参数 - 一个包含结果的数组和一个包含原数据对象。请注意，由于是原始查询，所以返回的元数据与使用的数据库类型有关，其对元数据的处理并不一致。</p>
+<pre>sequelize.query("UPDATE users SET y = 42 WHERE x = 12").spread(function(results, metadata) {
+  // Results 会是一个空数组和一个包含受影响行数的metadata 元数据对象
+})</pre>
+<p>如果不想使用元数据，可以查询时指定表示查询类型的<code>type</code>参数，以告诉sequelize 应该怎样去格式化返回结果。</p>
+<pre>sequelize.query("SELECT * FROM `users`", { type: sequelize.QueryTypes.SELECT})
+  .then(function(users) {
+    // 并不需要在这spread 展开结果，因为所返回的只有所查询的结果
+  })</pre>
+<p>在选项参数中，可以使用<code>model</code>参数指定一个模型，指定后会将查询结果会是传入模型的实例：</p>
+<pre>// 调用已定义的模型并对其创建实例
+sequelize.query('SELECT * FROM projects', { model: Projects }).then(function(projects){
+  // 每条记录都是一个Project 实例
+})</pre>
+<p><br /></p>
+<h4 id="raw-replacements">2.2 查询参数替换</h4>
+<p>原始查询中有两种替换查询参数的方法，以<code>:</code>开头的参数的形式替换或以不命名以<code>?</code>替换。在选项对象中传递参数：</p>
+<ul>
+<li>如果传递一个数组，<code>?</code> 会按数组的顺序被依次替换</li>
+<li>巢传递一个对象，<code>:key</code>将会用对象的键替换。如果对象中未找到指定键，则会引发异常（反之亦然）</li>
+</ul>
+<pre>sequelize.query('SELECT * FROM projects WHERE status = ?',
+  { replacements: ['active'], type: sequelize.QueryTypes.SELECT }
+).then(function(projects) {
+  console.log(projects)
+})
+
+sequelize.query('SELECT * FROM projects WHERE status = :status ',
+  { replacements: { status: 'active' }, type: sequelize.QueryTypes.SELECT }
+).then(function(projects) {
+  console.log(projects)
+})</pre>
+<p><br /></p>
+<h4 id="raw-bind">2.3 参数绑定</h4>
+<p>参数绑定类似于参数替换。尤其是参数替换会在发送到数据库前被sequelize转义和替换，而参数绑定会被发送到SQL 查询文本外。</p>
+<p>只有SQLite 和 PostgreSQL支持参数绑定，其它类型数据库都会将其插入到SQL 查询，并以相同的方式进行参数替换。参数绑定可以使用$1、$2……或$key的形式：</p>
+<ul>
+<li>如果传入的是数组，<code>$1</code>会绑定到数组听第1个参数 (<code>bind[0]</code>)</li>
+<li>如果传入一个对象，<code>$key</code>会绑定到<code>object['key']</code>。每个key 必须以非数字的字符开始。<code>$1</code>不是个有效的key，尽管<code>object['1']</code> 是存在的。</li>
+<li>在使用<code>$$</code>时，不会被转义而是将<code>$</code>做为一个字面量使用。</li>
+</ul>
+<p>传入的数组或对象必须包含所有绑定值，否则Sequelize会抛出异常。这同样适用于数据库可能会忽略绑定参数的情况下。</p>
+<p>数据库可能会做进一步限制，绑定参数不能使用数据库关键字，也不能是表或列名，它在引用文本或数据时也可能被忽略。在PostgreSQL中，如果不能从上下文<code>$1::varchar</code>中推断类型，那么也需要进行类型转换。</p>
+<pre>sequelize.query('SELECT *, "text with literal $$1 and literal $$status" as t FROM projects WHERE status = $1',
+  { bind: ['active'], type: sequelize.QueryTypes.SELECT }
+).then(function(projects) {
+  console.log(projects)
+})
+
+sequelize.query('SELECT *, "text with literal $$1 and literal $$status" as t FROM projects WHERE status = $status',
+  { bind: { status: 'active' }, type: sequelize.QueryTypes.SELECT }
+).then(function(projects) {
+  console.log(projects)
+})</pre>
+                        </div>
+                   </article>
+                   <div>
+
+	<p>下一篇：<a href="/nodejs/npm/N1sdaHTzb.html">Sequelize 中文API文档－5. 实例的使用、Instance类介绍</a>
+
+
+	<p>上一篇：<a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的关系/关联</a>
+
+</div>
+              </div>
+
+              <div id="sidebar" class="col-sm-4 col-md-4">
+                  <aside class="widget">
+    <form method="post" action="/search" class="form-horizontal">
+    <div class="form-group">
+        <div class="col-sm-9">
+            <input placeholder="关键字" name="keyword" class="form-control" type="text"  >
+        </div>
+        <div class="col-sm-3">
+            <button type="submit" class="btn btn-default">&nbsp;&nbsp;搜索&nbsp;&nbsp;</button>
+        </div>
+    </div>
+    </form>
+</aside>
+                  
+<aside class="widget">
+    <h4>文章分类</h4>
+    <ul class="grove-list">
+    
+    	
+    		<li><a href="/nodejs/core">基础、核心、API</a></li>
+    	
+    
+    	
+    		<li class="active"><a href="#">包、应用</a></li>
+    	
+    
+    </ul>
+</aside>
+
+                  
+<aside class="widget">
+    <h4>阅读排行</h4>
+    <ul class="grove-list">
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VkYIaRPz-.html">Sequelize 中文API文档－1. 快速入门、Seq...</a> (111793)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定...</a> (111550)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a> (36951)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/linux/management/NymXRUieg.html">解决类似 /usr/lib64/libstdc++.so....</a> (36371)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的...</a> (31834)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/EkwKysXIl.html">HTTP请求方法：GET、HEAD、POST、PUT、DE...</a> (14940)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/javascript/js/41KMSZ9a.html">［ES6］Promise对象Promise.all()方法...</a> (13937)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/N1sdaHTzb.html">Sequelize 中文API文档－5. 实例的使用、In...</a> (13690)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJHw6ScNb.html">bluebird与原生Promise对象及bluebird...</a> (12755)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/database/mongo/E1tWQz4_e.html">MongoDB索引管理－索引的创建、查看、删除</a> (12430)</h5>
+         </li>
+        
+    </ul>
+</aside>
+
+                  <aside class="widget">
+    <h4>最新文章</h4>
+    <ul class="grove-list">
+    
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/core/Sy-2trZhQ.html">Node.js 的 Http/2 模块</a></h5>
+              <p><code>http2</code>模块是自Node.js<code>v8.4.0</code>起...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/r1IhFZV-X.html">Blockly 创建自定义块-Blockly 开发者工具</a></h5>
+              <p>Blockly Developer Tools 是一个基于Web的开发者工具，它可以通过配置自动化...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/H1huYbEWQ.html">Blockly 创建自定义块-概述</a></h5>
+              <p>将 Blockly 集成到应用中后，或多或少总是需要创建一些<code>"块"</code>。本篇...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/S1BhIhdtG.html">Sequelize 嵌套模型查询及嵌套模型字段排序</a></h5>
+              <p>Sequelize 的“嵌套模型查询”最终会生成SQL“连接查询”语句，即生成'inner joi...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/By7L5p3ff.html">gyp 文件输入格式参考</a></h5>
+              <p><code>GYP</code>（node-gyp）基于<code>.gyp</code>文件构建...</p>
+         </li>
+        
+    
+    </ul>
+</aside>
+                  <!-- <aside class="widget">
+    <h4>广告</h4>
+    <p><a href="http://redirect.simba.taobao.com/rd?w=unionnojs&f=http%3A%2F%2Fai.taobao.com%2Fauction%2Fedetail.htm%3Fe%3D80FuZnNB1TS6k0Or%252B%252BH4tPg7Qoo6gIwW72fxp1Fq8BiLltG5xFicOdXrTUTgh9sMDPIwxrc30rhDsYaO8QAt%252FkUldzjpLCiPsn0%252BfXTZJrM4I6TE1Mm7FG3abJM7sDg2X7UB%252FLMklcjcDCUJyXw5Pg%253D%253D%26ptype%3D100010%26from%3Dbasic&k=5ccfdb950740ca16&c=un&b=alimm_0&p=mm_26749822_9476439_31826248" rel="nofollow">一包饼〜〜〜</a></p>
+</aside> -->
+                  
+
+                  <aside class="widget">
+    <h4>交流群：564850876</h4>
+    <p><img src="/img/qq-group.png" alt="交流群：564850876" /></p>
+</aside>
+                  <!-- <aside class="widget last">
+	<h4>友情链接</h4>
+	<ul class="grove-list">
+	     <li><a href="http://www.koocode.com" target="_blank">酷码</a></li>
+	</ul>
+</aside> -->
+              </div>
+         </div>
+    </section>
+</div>
+<script type="text/javascript">
+var xhr = new XMLHttpRequest();
+xhr.open("put", "/nodejs/npm/VJIR1CjMb.html", true);
+// xhr.onreadystatechange = function() { if (xhr.readyState == 4) {console.log(xhr.responseText);}}
+xhr.send();
+</script>
+<footer>
+<div class="container">
+    <!-- <div class="row info">
+        <div class="col-sm-3 residence">
+        
+        </div>
+        <div class="col-sm-5 touch">
+            <ul>
+                <li><strong></strong></li>
+                <li>email：</strong>cn.liuht@gmail.com</li>
+            </ul>
+        </div>
+    </div> -->
+    <div class="row credits">
+        <div class="col-md-12">
+            <div class="row copyright">
+                <div class="col-md-12">
+                 Copyright ©2015-2017 www.itbilu.com all rights reserved<a href="http://www.miitbeian.gov.cn/" target="_blank">京ICP备11014171号-3</a>
+                </div>
+            </div>
+        </div>            
+    </div>
+</div>
+</footer>
+</div>
+<script type="text/javascript" src="//cdn.itbilu.com/js/main-min.js"></script>
+<script type="text/javascript">
+	$(function () { $("[data-toggle='tooltip']").tooltip(); });
+	
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?2249745ad1ce80c1744fc6aede553fc1";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	 
+	(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+</body>
+</html>

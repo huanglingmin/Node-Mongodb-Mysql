@@ -6,11 +6,15 @@ const Utils = require('../../tool/utils');
 
 // 登陆
 router.post('/login', async function (req, res, next) {
-  const result = await USER.userLogin(req.body);
+  const result = await USER.userLogin(req.body.iphone, req.body.password);
   if (result) {
-    // 设置session
-    req.session.user = result;
-    res.ok('登陆成功', result);
+    if (result.delete) {
+      res.forbidden('帐号不存在!');
+    } else {
+      // 设置session
+      req.session.user = result;
+      res.ok('登陆成功', result);
+    }
   } else {
     res.forbidden('用户名或密码错误!');
   }
@@ -18,7 +22,7 @@ router.post('/login', async function (req, res, next) {
 
 // 注册
 router.post('/register', async function (req, res, next) {
-  const result = await USER.register(req.body.iphone, req.body.username, req.body.password);
+  const result = await USER.register(req.body.iphone, req.body.nickname, req.body.password, req.body.email, req.body.residence);
   if (result) {
     res.ok('注册成功', result)
   } else {
@@ -38,7 +42,6 @@ router.get('/userList', async (req, res, next) => {
   req.query.pageNum = Math.floor(req.query.pageNum);
   req.query.pageSize = Math.floor(req.query.pageSize);
   const result = await USER.getUserList(req.query.pageNum, req.query.pageSize);
-  // const result = await AETICLE.getArticleList(req.query.pageNum, req.query.pageSize);
   if (result) {
     res.ok('success', result)
   } else {
@@ -54,4 +57,14 @@ router.post('/delUserList', async (req, res, next) => {
     res.forbidden('删除失败');
   }
 });
+
+// 忘记密码修改
+router.post('/forgetPassword', async (req, res, next) => {
+  const result = await USER.forgetPassword(req.body.iphone, req.body.email, req.body.nickname, req.body.residence, req.body.password);
+  if (result) {
+    res.ok('success', '修改成功')
+  } else {
+    res.forbidden('修改失败');
+  }
+})
 module.exports = router;

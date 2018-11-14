@@ -1,0 +1,1612 @@
+<!doctype html>
+<html class="no-js">
+<head>
+	<meta charset="utf-8">
+	<meta name="baidu-site-verification" content="O5DO1n0DYd" />
+	<meta name="google-site-verification" content="JpblxCnu30QFTXwwVV3BFBDP9ObDXUOXlhFWiVIYsOo" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="&lt;code&gt;Sequelize&lt;/code&gt;类是引用&lt;code&gt;sequlize&lt;/code&gt;模块后获取一个顶级对象，我们通过它来创建&lt;code&gt;sequlize&lt;/code&gt;实例，也可以通过该对象来获取模内其它对象的引用，如：&lt;code&gt;Utils&lt;/code&gt;工具类、&lt;code&gt;Transaction&lt;/code&gt;事务类等。创建实例后，可以通过实例来创建或定义&lt;code&gt;Model&lt;/code&gt;（模型）、执行查询、同步数据库结构等操作。" />
+	<title>Sequelize 中文API文档－1. 快速入门、Sequelize类 - IT笔录</title>
+	<link rel="canonical" href="//itbilu.com/nodejs/npm/VkYIaRPz-.html"/>
+	<link rel="icon" href="/img/logo_32X32.ico" type="image/x-icon" />
+	<link href="//cdn.itbilu.com/css/main-min.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header>
+     <div class="container">
+          <div class="navbar navbar-default" role="navigation">
+               <div class="navbar-header">
+                    <a class="navbar-brand" href="/"> 
+                         <img src="/img/logo.png" alt="optional logo" height="90" width="90"> 
+                         <span class="logo_title"><strong>IT笔录</strong></span> 
+                         <span class="logo_subtitle">学习，记录，整理</span> 
+                    </a>
+                    <a class="btn btn-navbar btn-default navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                         <span class="nb_left pull-left"> 
+                              <span class="fa fa-reorder"></span>
+                         </span>
+                         <span class="nb_right pull-right">menu</span>
+                    </a>
+               </div>
+               <div class="collapse navbar-collapse">
+                    <ul class="nav pull-right navbar-nav">
+                         <li ><a href="/">首页</a></li>
+                         <li  class="active"><a href="/nodejs">Nodejs</a></li>
+                         <li ><a href="/javascript">javaScript</a></li>
+                         <li ><a href="/database">数据库</a></li>
+                         <li ><a href="/linux">Linux</a></li>
+                         <li ><a href="/tools">工具</a></li>
+                         <li ><a href="/other">其它</a></li>
+                    </ul>
+               </div>
+          </div>
+     </div>
+</header>
+<div class="main">
+<div class="container">
+    <section>
+         <div class="row breadcrumb-row">
+      <ul class="breadcrumb">
+      	
+      		<li><a href="/">首页</a></li>
+      		
+      		    
+                <li><a href="/nodejs">Node.js</a></li>
+                
+                    <li><a href="/nodejs/npm">包、应用</a></li>
+                
+              
+      		
+      	
+      </ul>
+ </div>
+         <div class="row">
+              <div id="leftcol" class="col-sm-8 col-md-8">
+                 <h1>Sequelize 中文API文档－1. 快速入门、Sequelize类</h1>
+                   <p><i class="fa fa-clock-o" title="发布时间"></i>&nbsp;2016年05月20日
+                   &nbsp;&nbsp;
+                   <i class="fa fa-eye" title="阅读"></i>
+                   111794
+                   &nbsp;&nbsp;
+                   <span data-toggle="tooltip" title="声明：本站文章及示例基于特定的环境或软件版本，本站不为因参考本站文章引起的错误或损失负责。在使用前请自行验证是否可用于实际环境。如有纰漏或错误，欢迎进群指正、交流。"><i class="fa fa-exclamation-circle"></i>&nbsp;声明</span>
+                  </p>
+                   <article class="post">
+                        <div class="post_content">
+                        
+                        
+<p><br /></p>
+<p><code>Sequelize</code>类是引用<code>sequlize</code>模块后获取一个顶级对象，我们通过它来创建<code>sequlize</code>实例，也可以通过该对象来获取模内其它对象的引用，如：<code>Utils</code>工具类、<code>Transaction</code>事务类等。创建实例后，可以通过实例来创建或定义<code>Model</code>（模型）、执行查询、同步数据库结构等操作。</p>
+<ol>
+	<li><a href="#induction">快速入门</a>
+  <ul>
+    <li><a href="#induction-install">1.1 安装</a></li>
+    <li><a href="#induction-connection">1.2 建立连接</a></li>
+    <li><a href="#induction-model">1.3 <code>model</code>定义</a></li>
+    <li><a href="#induction-promise">1.4 <code>Promise</code></a></li>
+  </ul>
+  </li>
+  <li><a href="#api"><code>Sequelize</code>类</a>
+  <ul>
+    <li><a href="#api-init">2.1 <code>new Sequelize()</code> - 实例化</a></li>
+    <li><a href="#api-init-url">2.2 <code>new Sequelize()</code> - 通过URI实例化</a></li>
+    <li><a href="#api-instance-models">2.3 <code>sequelize.models</code> - 实例中已定义的模型</a></li>
+    <li><a href="#api-instance-method">2.4 <code>sequelize.define()</code> - 模型定义</a></li>
+    <li><a href="#api-sequelize">2.5 <code>Sequelize</code> - 顶级对象</a></li>
+    <li><a href="#api-Utils">2.6 <code>Utils</code> - 工具类</a></li>
+    <li><a href="#api-Promise">2.7 <code>Promise</code> - Promise对象</a></li>
+    <li><a href="#api-QueryTypes">2.8 <code>QueryTypes</code> - 查询类型枚举</a></li>
+    <li><a href="#api-Validator">2.9 <code>Validator</code> - <code>validator.js</code>对象</a></li>
+    <li><a href="#api-Transaction">2.10 <code>Transaction</code> - 事务对象</a></li>
+    <li><a href="#api-Deferrable">2.11 <code>Deferrable</code> - 延时对象</a></li>
+    <li><a href="#api-Instance">2.12 <code>Instance</code> - 实例对象</a></li>
+    <li><a href="#api-Association">2.13 <code>Association</code> - 联合关系对象</a></li>
+    <li><a href="#api-Error">2.14 <code>Error</code> - 错误对象</a></li>
+    <li><a href="#api-ValidationError">2.15 <code>ValidationError</code> - 验证失败错误对象</a></li>
+    <li><a href="#api-DatabaseError">2.16 <code>DatabaseError</code> - 数据库错误对象</a></li>
+    <li><a href="#api-TimeoutError">2.17 <code>TimeoutError</code> - 查询超时错误对象</a></li>
+    <li><a href="#api-UniqueConstraintError">2.18 <code>UniqueConstraintError</code> - 唯一性错误对象</a></li>
+    <li><a href="#api-ExclusionConstraintError">2.19 <code>ExclusionConstraintError</code> - 排出约束错误对象</a></li>
+    <li><a href="#api-ForeignKeyConstraintError">2.20 <code>ForeignKeyConstraintError</code> - 外键约束错误对象</a></li>
+    <li><a href="#api-ConnectionError">2.21 <code>ConnectionError</code> - 连接错误对象</a></li>
+    <li><a href="#api-ConnectionRefusedError">2.22 <code>ConnectionRefusedError</code> - 连接拒绝错误对象</a></li>
+    <li><a href="#api-AccessDeniedError">2.23 <code>AccessDeniedError</code> - 无访问权限错误对象</a></li>
+    <li><a href="#api-HostNotFoundError">2.24 <code>HostNotFoundError</code> - 主机未找到错误对象</a></li>
+    <li><a href="#api-InvalidConnectionError">2.25 <code>InvalidConnectionError</code> - 无效链接错误对象</a></li>
+    <li><a href="#api-ConnectionTimedOutError">2.26 <code>ConnectionTimedOutError</code> - 链接超时错误对象</a></li>
+    <li><a href="#api-InstanceError">2.27 <code>InstanceError</code> - 实例错误对象</a></li>
+    <li><a href="#api-instance-getDialect">2.28 <code>sequelize.getDialect()</code> - 返回数据库类型</a></li>
+    <li><a href="#api-instance-getQueryInterface">2.29 <code>sequelize.getQueryInterface()</code> - 返回<code>QueryInterface</code>实例</a></li>
+    <li><a href="#api-instance-define">2.30 <code>sequelize.define()</code> - 模型定义</a></li>
+    <li><a href="#api-instance-model">2.31 <code>sequelize.model()</code> - 获取模型</a></li>
+    <li><a href="#api-instance-isDefined">2.32 <code>sequelize.isDefined()</code> - 检查模型是否定义</a></li>
+    <li><a href="#api-instance-import">2.33 <code>sequelize.import()</code> - 模型导入</a></li>
+    <li><a href="#api-instance-query">2.34 <code>sequelize.query()</code> - 执行查询</a></li>
+    <li><a href="#api-instance-set">2.35 <code>sequelize.set()</code> - 设置变量</a></li>
+    <li><a href="#api-instance-escape">2.36 <code>sequelize.escape()</code> - 编码</a></li>
+    <li><a href="#api-instance-createSchema">2.37 <code>sequelize.createSchema()</code> - 创建数据库 schema</a></li>
+    <li><a href="#api-instance-showAllSchemas">2.38 <code>sequelize.showAllSchemas()</code> - 查询已定义的schema</a></li>
+    <li><a href="#api-instance-dropSchema">2.39 <code>sequelize.dropSchema()</code> - 删除定义的schema</a></li>
+    <li><a href="#api-instance-dropAllSchemas">2.40 <code>sequelize.dropAllSchemas()</code> - 删除所有schema</a></li>
+    <li><a href="#api-instance-sync">2.41 <code>sequelize.sync()</code> - 同步模型到数据库</a></li>
+    <li><a href="#api-instance-truncate">2.42 <code>sequelize.truncate()</code> - 截断已定义的表</a></li>
+    <li><a href="#api-instance-drop">2.43 <code>sequelize.drop()</code> - 删除表</a></li>
+    <li><a href="#api-instance-authenticate">2.44 <code>sequelize.authenticate()</code> - 验证连接</a></li>
+    <li><a href="#api-instance-fn">2.45 <code>sequelize.fn()</code> - 函数调用</a></li>
+    <li><a href="#api-instance-col">2.46 <code>sequelize.col()</code> - 列对象</a></li>
+    <li><a href="#api-instance-cast">2.47 <code>sequelize.cast()</code> - cast函数</a></li>
+    <li><a href="#api-instance-literal">2.48 <code>sequelize.literal()</code> - 字面量对象</a></li>
+    <li><a href="#api-instance-and">2.49 <code>sequelize.and()</code> - AND查询</a></li>
+    <li><a href="#api-instance-or">2.50 <code>sequelize.or()</code> - OR查询</a></li>
+    <li><a href="#api-instance-json">2.51 <code>sequelize.json()</code> - json嵌套对象</a></li>
+    <li><a href="#api-instance-where">2.52 <code>sequelize.where()</code> - 指定WHERE条件</a></li>
+    <li><a href="#api-instance-transaction">2.53 <code>sequelize.transaction()</code> - 启动事务</a></li>
+  </ul>
+  </li>
+</ol>
+<h3 id="induction">1. 快速入门</h3>
+<h4 id="induction-install">1.1 安装</h4>
+<p><code>Sequelize</code>可以通过<code>npm</code>命令获取，除安装<code>sequelize</code>模块外还要安装所使用数据的驱动模块：</p>
+<pre>$ npm install --save sequelize
+
+# 还需要安装以下之一：
+$ npm install --save pg pg-hstore  // postgreSql
+$ npm install --save mysql // mysql 或 mariadb
+$ npm install --save sqlite3  
+$ npm install --save tedious // MSSQL</pre>
+<p><br /></p>
+<h4 id="induction-connection">1.2 建立连接</h4>
+<p><code>Sequelize</code>会在初始化时设置一个连接池，这样你应该为每个数据库创建一个实例：</p>
+<pre>var sequelize = new Sequelize('database', 'username', 'password', {
+  host: 'localhost',
+  dialect: 'mysql'|'mariadb'|'sqlite'|'postgres'|'mssql',
+
+  pool: {
+    max: 5,
+    min: 0,
+    idle: 10000
+  },
+
+  // 仅 SQLite 适用
+  storage: 'path/to/database.sqlite'
+});
+
+// 或者可以简单的使用一个连接 uri
+var sequelize = new Sequelize('postgres://user:pass@example.com:5432/dbname');</pre>
+<p><br /></p>
+<h4 id="induction-model">1.3 <code>model</code>定义</h4>
+<p><code>model</code>定义格式为<code>sequelize.define('name', {attributes}, {options})</code>：</p>
+<pre>var User = sequelize.define('user', {
+  firstName: {
+    type: Sequelize.STRING,
+    field: 'first_name' // Will result in an attribute that is firstName when user facing but first_name in the database
+  },
+  lastName: {
+    type: Sequelize.STRING
+  }
+}, {
+  freezeTableName: true // Model 对应的表名将与model名相同
+});
+
+User.sync({force: true}).then(function () {
+  // 已创建数据表
+  return User.create({
+    firstName: 'John',
+    lastName: 'Hancock'
+  });
+});</pre>
+<p><br /></p>
+<h4 id="induction-promise">1.4 <code>Promise</code></h4>
+<p><code>Sequelize</code>基于<a href="http://itbilu.com/javascript/js/VJiycgJq.html" target="_blank"><code>Promise</code></a>实现异步流程控制，但其使用的并不是<code>ECMAScript 6</code>中规定的标准<code>Promise</code>对象，而是使用<a href="http://bluebirdjs.com/docs/api-reference.html" target="_balnk">bluebird</a>，这个模块是对原生<code>Promise</code>的一个扩展。</p>
+<p>由于是基于<code>Promise</code>实现的流程控制，所以不能像下面这样获取查询值：</p>
+<pre>user = User.findOne()
+
+console.log(user.get('firstName'));</pre>
+<p><code>user</code>是一个<code>promise</code>对象而不是</p>
+<p><br /></p>
+<h3 id="api">2. <code>Sequelize</code>类</h3>
+<h4 id="api-init">2.1 <code>new Sequelize()</code> - 实例化</h4>
+<pre>new Sequelize(database, [username=null], [password=null], [options={}])</pre>
+<p><code>require</code>引用后，会指向<code>Sequelize</code>的主类的构造函数，引用后就可以通过<code>new</code>关键字进行实例化，实例化后就会以连接池的形式连接到所使用的数据库。语法结构如下：</p>
+<pre>var Sequelize = require('sequelize');
+
+var sequelize = new Sequelize(database, [username=null], [password=null], [options={}])</pre>
+<p>实例化<code>Sequelize</code>时，需要传入数据库名、用户名和密码，还可以传入一个可选的<code>options</code>参数对象。</p>
+<p><strong id="sequelize-option">实例化参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>database</td>
+<td>String</td>
+<td>数据库名</td>
+</tr>
+<tr>
+<td>[username=null]</td>
+<td>String</td>
+<td>数据库用户名</td>
+</tr>
+<tr>
+<td>[password=null]</td>
+<td>String</td>
+<td>数据库密码</td>
+</tr>
+<tr>
+<td>[options={}]</td>
+<td>Object</td>
+<td>参数对象</td>
+</tr>
+<tr>
+<td>[options.dialect='mysql']</td>
+<td>String</td>
+<td>要连接的数据库类型。可选值有：mysql、postgres、sqlite、mariadb、mssql</td>
+</tr>
+<tr>
+<td>[options.dialectModulePath=null]</td>
+<td>String</td>
+<td>指定后，将通过此路径模块加载数据库</td>
+</tr>
+<tr>
+<td>[options.dialectOptions]</td>
+<td>Object</td>
+<td>路径模块所使用的扩展选项</td>
+</tr>
+<tr>
+<td>[options.storage]</td>
+<td>String</td>
+<td>仅用于sqlite， 默认为':memory:'</td>
+</tr>
+<tr>
+<td>[options.host='localhost']</td>
+<td>String</td>
+<td>连接数据库的主机</td>
+</tr>
+<tr>
+<td>[options.port=]</td>
+<td>String</td>
+<td>连接数据库的端口</td>
+</tr>
+<tr>
+<td>[options.protocol='tcp']</td>
+<td>String</td>
+<td>连接数据库使用的协议</td>
+</tr>
+<tr>
+<td>[options.define={}]</td>
+<td>Object</td>
+<td>定义模型的选项，默认为<a href="#api-instance-define">'sequelize.define'选项</a></td>
+</tr>
+<tr>
+<td>[options.query={}]</td>
+<td>Object</td>
+<td>'sequelize.query'的默认选项</td>
+</tr>
+<tr>
+<td>[options.set={}]</td>
+<td>Object</td>
+<td>'sequelize.set'的默认选项</td>
+</tr>
+<tr>
+<td>[options.sync={}]</td>
+<td>Object</td>
+<td>'sequelize.sync'的默认选项</td>
+</tr>
+<tr>
+<td>[options.timezone='+00:00']</td>
+<td>String</td>
+<td>时间转换时从数据库得到的JavaScript时间。这个时区将应用于连接服务器的 NOW、CURRENT_TIMESTAMP或其它日期函数</td>
+</tr>
+<tr>
+<td>[options.logging=console.log]</td>
+<td>Function</td>
+<td>用于Sequelize日志打印的函数</td>
+</tr>
+<tr>
+<td>[options.omitNull=false]</td>
+<td>Boolean</td>
+<td>null值是否通过SQL查询</td>
+</tr>
+<tr>
+<td>[options.native=false]</td>
+<td>Boolean</td>
+<td>是否使用本地库，仅用于 postgres</td>
+</tr>
+<tr>
+<td>[options.replication=false]</td>
+<td>Boolean</td>
+<td>是否使用读/写复制(读写分离)。
+<p>要启用读/写复制，需要传递一个对象，这个对象有<code>read</code>、<code>write</code>两个属性。<code>write</code>是一个单一的对象(由单台服务器处理写入)，而<code>read</code>是一个包含对象的数组(由多台服务器处理读取)。每台<code>read</code>、<code>write</code>服务器都可以包含以下属性：<code>host</code>、<code>port</code>、<code>username</code>、<code>password</code>、<code>database</code>。
+<br>
+读写分离的使用请参考：<a href="http://itbilu.com/nodejs/npm/VydcPndib.html">Sequelize 实现数据库读写分离</a>
+</p>
+</td>
+</tr>
+<tr>
+<td>[options.pool={}]</td>
+<td>Object</td>
+<td>使用连接池连接，默认为<code>true</code></td>
+</tr>
+<tr>
+<td>[options.pool.maxConnections]</td>
+<td>Integer</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.pool.minConnections]</td>
+<td>Integer</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.pool.maxIdleTime]</td>
+<td>Integer</td>
+<td>连接最大空置时间（毫秒），超时后将释放连接</td>
+</tr>
+<tr>
+<td>[options.pool.validateConnection]</td>
+<td>Function</td>
+<td>连接验证函数</td>
+</tr>
+<tr>
+<td>[options.quoteIdentifiers=true]</td>
+<td>Boolean</td>
+<td>设置为<code>false</code>时Postgres中会使表名和属性大小写不敏感，并跳过双引号</td>
+</tr>
+<tr>
+<td>[options.transactionType='DEFERRED']</td>
+<td>String</td>
+<td>设置事务类型，详见<a href="http://itbilu.com/nodejs/npm/EJO6CcCM-.html#usage" target="_blank"><code>Sequelize.Transaction.TYPES</code></a>。仅Sqlite适用</td>
+</tr>
+<tr>
+<td>[options.isolationLevel='REPEATABLE_READ']</td>
+<td>String</td>
+<td>设置事件的隔离级别，详见<a href="http://itbilu.com/nodejs/npm/EJO6CcCM-.html#usage-isolations" target="_blank"><code>Sequelize.Transaction.ISOLATION_LEVELS</code></a></td>
+</tr>
+<tr>
+<td>[options.retry]</td>
+<td>Object</td>
+<td>设置自动查询时的重试标志</td>
+</tr>
+<tr>
+<td>[options.retry.match]</td>
+<td>Array</td>
+<td>匹配到指定的错误字符串之一后重试查询</td>
+</tr>
+<tr>
+<td>[options.retry.max]</td>
+<td>Integer</td>
+<td>设置重试次数</td>
+</tr>
+<tr>
+<td>[options.typeValidation=false]</td>
+<td>Boolean</td>
+<td>在插入、更新等操作时执行类型验证</td>
+</tr>
+<tr>
+<td>[options.benchmark=false]</td>
+<td>Boolean</td>
+<td>在打印执行的SQL日志时输出执行时间（毫秒）</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<p><strong id="sequelize-example"><code>Sequelize</code>实例化示例</strong></p>
+<pre>// 不使用密码和选项
+var sequelize = new Sequelize('database', 'username')
+
+// 不使用选项
+var sequelize = new Sequelize('database', 'username', 'password')
+
+// 不使用密码/空密码
+var sequelize = new Sequelize('database', 'username', null, {})
+
+// 使用密码和选项
+var sequelize = new Sequelize('my_database', 'john', 'doe', {})</pre>
+<p><code>Sequelize</code>实例化（初始化）有以上几种形式，通过构造函数实例化后，就可以通过其返回的<code>sequelize</code>实例定义<code>Model</code>、执行<code>query</code>查询、执行<code>transaction</code>等。</p>
+<p><br /></p>
+<h4 id="api-init-url">2.2 <code>new Sequelize()</code> - 通过URI实例化</h4>
+<pre>new Sequelize(uri, [options={}])</pre>
+<p><code>Sequelize</code>可以通过一个URI进行实例化：</p>
+<pre>// 使用Uri连接
+var sequelize = new Sequelize('mysql://localhost:3306/database', {})</pre>
+<p><br /></p>
+<h4 id="api-instance-models">2.3 <code>sequelize.models</code> - 实例中已定义的模型</h4>
+<pre>sequelize.models</pre>
+<p>该实例属性用于返回通过<code>sequelize.define</code>定义的所有模型对象</p>
+<pre>sequelize.models;
+// 返回值如下
+{ User: User,
+  UserRole: UserRole,
+  …… }</pre>
+<p><br /></p>
+<h4 id="api-instance-method">2.4 <code>sequelize.define()</code> - 模型定义</h4>
+<pre>sequelize.define(modelName, attributes, [options]) -> Modal</pre>
+<p>这个实例方法用于定义一个新<code>Model</code>（模型）。<code>Model</code>相当于数据库中的表，该对象不能通过构造函数实例化，而只能通过<code>sequelize.define()</code>或<code>sequelize.import()</code>方法创建。</p>
+<p>表中的字段通过第二个参数对象<code>attributes</code>来定义，对象中的一个属性相当于表中的一个字段。</p>
+<p>如，可以像下面这样定义一个表：</p>
+<pre>sequelize.define('modelName', {
+    columnA: {
+        type: Sequelize.BOOLEAN,
+        validate: {
+          is: ["[a-z]",'i'],        // will only allow letters
+          max: 23,                  // only allow values <= 23
+          isIn: {
+            args: [['en', 'zh']],
+            msg: "Must be English or Chinese"
+          }
+        },
+        field: 'column_a'
+        // Other attributes here
+    },
+    columnB: Sequelize.STRING,
+    columnC: 'MY VERY OWN COLUMN TYPE'
+})
+
+sequelize.models.modelName // The model will now be available in models under the name given to define</pre>
+<p><br /></p>
+<h4 id="api-sequelize">2.5 <code>Sequelize</code> - 顶级对象</h4>
+<pre>var Sequelize = require('sequelize');</pre>
+<p><code>Sequelize</code>是一个指向sequelize模块顶级对象引用，同时也是一个构造函数。可以通过该构造函数进行<code>Sequelize</code>类的实例化；也可以通过该对象来访问模块中子对象，如：<code>DataTypes</code>、<code>Errors</code>、<code>Transactions</code>等。</p>
+<p><br /></p>
+<h4 id="api-Utils">2.6 <code>Utils</code> - 工具类</h4>
+<pre>Sequelize.Utils</pre>
+<p>一个指定sequelize中工具类的引用，大多数情况下需要直接引用该对象，如：可以使用<code>Sequelize.Utils._</code>属性，该属性是一个指向<code>lodash</code>库的引用，如果你项目中没有另外引用该库就可以通过该属性来调用。</p>
+<p><br /></p>
+<h4 id="api-Promise">2.7 <code>Promise</code> - Promise对象</h4>
+<pre>Sequelize.Promise</pre>
+<p>该属性是一个指向<code>bluebird</code>Promise类型的引用。</p>
+<p><br /></p>
+<h4 id="api-QueryTypes">2.8 <code>QueryTypes</code> - 查询类型枚举</h4>
+<pre>Sequelize.QueryTypes</pre>
+<p>用于<code>sequelize.query</code>的表示查询类型的枚举对象。可用类型如下：</p>
+<pre>module.exports = {
+  SELECT: 'SELECT',
+  INSERT: 'INSERT',
+  UPDATE: 'UPDATE',
+  BULKUPDATE: 'BULKUPDATE',
+  BULKDELETE: 'BULKDELETE',
+  DELETE: 'DELETE',
+  UPSERT: 'UPSERT',
+  VERSION: 'VERSION',
+  SHOWTABLES: 'SHOWTABLES',
+  SHOWINDEXES: 'SHOWINDEXES',
+  DESCRIBE: 'DESCRIBE',
+  RAW: 'RAW',
+  FOREIGNKEYS: 'FOREIGNKEYS',
+};</pre>
+<p><br /></p>
+<h4 id="api-Validator">2.9 <code>Validator</code> - <code>validator.js</code>对象</h4>
+<pre>Sequelize.Validator</pre>
+<p>一个指定<code>validator.js</code>对象的引用，该对象用于Sequelize内部的验证，如：非常、URL、IP等，也可以通过该属性进行一些自定义验证。</p>
+<p><br /></p>
+<h4 id="api-Transaction">2.10 <code>Transaction</code> - 事务对象</h4>
+<pre>Sequelize.Transaction</pre>
+<p>该属性是一个指向Sequelize<code>Transaction</code>类的引用，要以使用这个属性来访问创建事务的隔离级别和事务类型等。</p>
+<p><br /></p>
+<h4 id="api-Deferrable">2.11 <code>Deferrable</code> - 延时对象</h4>
+<pre>Sequelize.Deferrable</pre>
+<p>指向一个延时集合的引用，通过个属必可以访问不通的延时选项。</p>
+<p><br /></p>
+<h4 id="api-Instance">2.12 <code>Instance</code> - 实例对象</h4>
+<pre>Sequelize.Instance</pre>
+<p>一个指定Sequelize实例类的引用。</p>
+<p><br /></p>
+<h4 id="api-Association">2.13 <code>Association</code> - 联合关系对象</h4>
+<pre>Sequelize.Association</pre>
+<p>一个指定<code>Association</code>类的引用。</p>
+<p><br /></p>
+<h4 id="api-Error">2.14 <code>Error</code> - 错误对象</h4>
+<pre>Sequelize.Error</pre>
+<p>Sequelize中生成错误的类</p>
+<p><br /></p>
+<h4 id="api-ValidationError">2.15 <code>ValidationError</code> - 验证失败错误对象</h4>
+<pre>Sequelize.ValidationError</pre>
+<p>验证失败时会生成此对象</p>
+<p><br /></p>
+<h4 id="api-DatabaseError">2.16 <code>DatabaseError</code> - 数据库错误对象</h4>
+<pre>Sequelize.DatabaseError</pre>
+<p>验证失败时会生成此对象</p>
+<p>指向一个所有数据库相关错误的类</p>
+<p><br /></p>
+<h4 id="api-TimeoutError">2.17 <code>TimeoutError</code> - 查询超时错误对象</h4>
+<pre>Sequelize.TimeoutError</pre>
+<p>当数据库查询超时时会生成<code>TimeoutError</code>对象。</p>
+<p><br /></p>
+<h4 id="api-UniqueConstraintError">2.18 <code>UniqueConstraintError</code> - 唯一性错误对象</h4>
+<pre>Sequelize.UniqueConstraintError</pre>
+<p>当数违反唯一约束时会生成<code>UniqueConstraintError</code>对象。</p>
+<p><br /></p>
+<h4 id="api-ExclusionConstraintError">2.19 <code>ExclusionConstraintError</code> - 排出约束错误对象</h4>
+<pre>Sequelize.ExclusionConstraintError</pre>
+<p>在数据库中违反排除约束时触发此错误。</p>
+<p><br /></p>
+<h4 id="api-ForeignKeyConstraintError">2.20 <code>ForeignKeyConstraintError</code> - 外键约束错误对象</h4>
+<pre>Sequelize.ForeignKeyConstraintError</pre>
+<p>在数据库中违反外键约束时触发此错误。</p>
+<p><br /></p>
+<h4 id="api-ConnectionError">2.21 <code>ConnectionError</code> - 连接错误对象</h4>
+<pre>Sequelize.ConnectionError</pre>
+<p>一个指向数据库连接错误时触发的错误对象。</p>
+<p><br /></p>
+<h4 id="api-ConnectionRefusedError">2.22 <code>ConnectionRefusedError</code> - 连接拒绝错误对象</h4>
+<pre>Sequelize.ConnectionRefusedError</pre>
+<p>一个指向数据库连接被拒绝时触发的错误对象。</p>
+<p><br /></p>
+<h4 id="api-AccessDeniedError">2.23 <code>AccessDeniedError</code> - 无访问权限错误对象</h4>
+<pre>Sequelize.AccessDeniedError</pre>
+<p>连接到数据库但没有访问权限时会触发此错误。</p>
+<p><br /></p>
+<h4 id="api-HostNotFoundError">2.24 <code>HostNotFoundError</code> - 主机未找到错误对象</h4>
+<pre>Sequelize.HostNotFoundError</pre>
+<p>连接数据但主机名（IP或URI）未找到时会触发这个错误对象。</p>
+<p><br /></p>
+<h4 id="api-InvalidConnectionError">2.25 <code>InvalidConnectionError</code> - 无效链接错误对象</h4>
+<pre>Sequelize.InvalidConnectionError</pre>
+<p>连接到数据库但其中的任意参数出现错误时会触发这个错误对象。</p>
+<p><br /></p>
+<h4 id="api-ConnectionTimedOutError">2.26 <code>ConnectionTimedOutError</code> - 链接超时错误对象</h4>
+<pre>Sequelize.ConnectionTimedOutError</pre>
+<p>连接数据库超时时会触发这个错误对象。</p>
+<p><br /></p>
+<h4 id="api-InstanceError">2.27 <code>InstanceError</code> - 实例错误对象</h4>
+<pre>Sequelize.InstanceError</pre>
+<p>当任何实例方法出现问题时会触发这个错误对象。</p>
+<p><br /></p>
+<h4 id="api-instance-getDialect">2.28 <code>sequelize.getDialect()</code> - 返回数据库类型</h4>
+<pre>sequelize.getDialect()</pre>
+<p>该实例方法用于返回实例类型（数据库类型）</p>
+<p><br /></p>
+<h4 id="api-instance-getQueryInterface">2.29 <code>sequelize.getQueryInterface()</code> - 返回<code>QueryInterface</code>实例</h4>
+<pre>sequelize.getQueryInterface()</pre>
+<p>返回<code>QueryInterface</code>的实例</p>
+<p>详见：<a href="https://itbilu.com/nodejs/npm/VyqgRUVf7.html#queryInterface" target="_blank"><code>queryInterface</code>对象及功能</a></p>
+<p><br /></p>
+<h4 id="api-instance-define">2.30 <code>sequelize.define()</code> - 模型定义</h4>
+<pre>define(modelName, attributes, [options]) -> Model</pre>
+<p>定义一个模型，该模型是一个建立了与数据表关系的对象</p>
+<p>被定义的表中的列在该方法的第二个参数中定义，可以理解为每个属性对应一个表的字段：</p>
+<pre>sequelize.define('modelName', {
+    columnA: {
+        type: Sequelize.BOOLEAN,
+        validate: {
+          is: ["[a-z]",'i'],        // will only allow letters
+          max: 23,                  // only allow values <= 23
+          isIn: {
+            args: [['en', 'zh']],
+            msg: "Must be English or Chinese"
+          }
+        },
+        field: 'column_a'
+        // Other attributes here
+    },
+    columnB: Sequelize.STRING,
+    columnC: 'MY VERY OWN COLUMN TYPE'
+})
+
+sequelize.models.modelName // The model will now be available in models under the name given to define</pre>
+<p>如上所示，列的定义可以是字符串、一个预定义的Sequelize构造函数、或是一个对象。在定义列时，我们可以指定数据类型，也可以指定默认值、主键/外键等约束，还可以自定义访问器（getter）和设置器（setter）。</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>modelName</td>
+<td>String</td>
+<td>模型名，在<code>sequelize.models</code>属性中会使用这个名称；如果没有在<code>options</code>中指定表名，数据库中也会使用此属性做为表名。</td>
+</tr>
+<tr>
+<td>attributes</td>
+<td>Object</td>
+<td>一个对象，其每个属性对应表中的一个列，每个列可以使用一个预定义的<code>DataType</code>、字符串或类型描述对象定义：</td>
+</tr>
+<tr>
+<td>attributes.column</td>
+<td>String | DataType | Object</td>
+<td>数据库中的列描述</td>
+</tr>
+<tr>
+<td>attributes.column.type</td>
+<td>String | DataType</td>
+<td><code>DataType</code>或字符串，表示列的数据类型</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.allowNull=true]</td>
+<td>Boolean</td>
+<td>设置为<code>false</code>时，会给添加<code>NOT NULL</code>（非空）约束，数据保存时会进行非空验证</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.defaultValue=null]</td>
+<td>Any</td>
+<td>字面默认值, JavaScript函数, 或一个 SQL 函数 (查看 <code>sequelize.fn</code>)</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.unique=false]</td>
+<td>String | Boolean</td>
+<td>设置为<code>true</code>时，会为列添加唯一约束</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.primaryKey=false]</td>
+<td>Boolean</td>
+<td>指定是否是主键</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.field=null]</td>
+<td>String</td>
+<td>设置在数据库中的字段名。设置后会，Sequelize会将属性名映射到数据库中的不同名称</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.autoIncrement=false]</td>
+<td>Boolean</td>
+<td>是否自增</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.comment=null]</td>
+<td>String</td>
+<td>字段描述（自<code>1.7+</code>后，此描述不再添加到数据库中）</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.references=null]</td>
+<td>String | Model</td>
+<td>引用对象</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.references.model]</td>
+<td>String | Model</td>
+<td>如果列引用到另一个表，可以通过这个属性设置模型或字符串。</td>
+</tr>
+<tr>
+<td>[attributes.column<br/>.references.key='id']</td>
+<td>String</td>
+<td>该列表示到表外键列的引用</td>
+</tr>
+<tr>
+<td>[attributes.column.onUpdate]</td>
+<td>String</td>
+<td>当被引用的键更新时的操作，可选值是：CASCADE, RESTRICT, SET DEFAULT, SET NULL 或 NO ACTION 之一</td>
+</tr>
+<tr>
+<td>[attributes.column.onDelete]</td>
+<td>String</td>
+<td>当被引用的键删除时的操作，可选值是：CASCADE, RESTRICT, SET DEFAULT, SET NULL 或 NO ACTION 之一</td>
+</tr>
+<tr>
+<td>[attributes.column.get]</td>
+<td>Function</td>
+<td>为列自定义一个访问器。使用<code>this.getDataValue(String)</code>时调用的值</td>
+</tr>
+<tr>
+<td>[attributes.column.set]</td>
+<td>Function</td>
+<td>为列自定义一个设置器。使用<code>this.setDataValue(String, Value)</code>时调用的值</td>
+</tr>
+<tr>
+<td>[attributes.validate]</td>
+<td>Object</td>
+<td>模型每次保存时调用的验证对象。可是<code>validator.js</code>中的验证函数(参见 <code>DAOValidator</code>)、或自定义的验证函数。</td>
+</tr>
+<tr>
+<td>[options]</td>
+<td>Object</td>
+<td>提供给Sequelize 构造函数的一些默认值</td>
+</tr>
+<tr>
+<td>[options.defaultScope={}]</td>
+<td>Object</td>
+<td>定义使用此模型的默认搜索范围。作用范围与提供给 find / findAll 的选项形式相同</td>
+</tr>
+<tr>
+<td>[options.scopes]</td>
+<td>Object</td>
+<td>更多范围，定义 defaultScope 的定义形式相同。关于限制范围的定义请参考<a href="http://itbilu.com/nodejs/npm/V1PExztfb.html#api-scope" target="_blank"><code>Model.scope</code></a></td>
+</tr>
+<tr>
+<td>[options.omitNull]</td>
+<td>Boolean</td>
+<td>是否忽略空值，这意味着，所有列的空值将不会被保存</td>
+</tr>
+<tr>
+<td>[options.timestamps=true]</td>
+<td>Boolean</td>
+<td>为模型添加 createdAt 和 updatedAt 两个时间戳字段</td>
+</tr>
+<tr>
+<td>[options.paranoid=false]</td>
+<td>Boolean</td>
+<td>使用逻辑删除。设置为<code>true</code>后，调用 <code>destroy</code> 方法时将不会删队模型，而是设置一个 <code>deletedAt</code> 列。此设置需要 <code>timestamps=true</code></td>
+</tr>
+<tr>
+<td>[options.underscored=false]</td>
+<td>Boolean</td>
+<td>转换列名的驼峰命名规则为下划线命令规则</td>
+</tr>
+<tr>
+<td>[options.underscoredAll=false]</td>
+<td>Boolean</td>
+<td>转换模型名的驼峰命名规则为表名的下划线命令规则</td>
+</tr>
+<tr>
+<td>[options.freezeTableName=false]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>时，sequelize不会改变表名，否则可能会按其规则有所调整</td>
+</tr>
+<tr>
+<td>[options.name]</td>
+<td>Object</td>
+<td>允有<code>singular</code> 和 <code>plural</code>两个属性的对象，在模型与其它模型关联时使用</td>
+</tr>
+<tr>
+<td>[options.name.singular=<br/>inflection.singularize(modelName)]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.name.plural=<br/>inflection.pluralize(modelName)]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.indexes]</td>
+<td>Array.&lt;Object&gt;</td>
+<td>要建立的索引</td>
+</tr>
+<tr>
+<td>[options.indexes[].name]</td>
+<td>String</td>
+<td>索引名，默认为模型名 + '_' + 字段名</td>
+</tr>
+<tr>
+<td>[options.indexes[].type]</td>
+<td>String</td>
+<td>索引类型，仅用于 mysql，其值为：<code>UNIQUE</code>、 <code>FULLTEXT</code> 或 <code>SPATIAL</code>之一</td>
+</tr>
+<tr>
+<td>[options.indexes[].method]</td>
+<td>String</td>
+<td>创建索引的方法(SQL中的<code>USING</code> 声明)。BTREE 或 HASH 可以在 mysql 和 postgres中支持，postgres中支持，还支持 GIST 和 GIN</td>
+</tr>
+<tr>
+<td>[options.indexes[].unique=false]</td>
+<td>Boolean</td>
+<td>设置索引是否唯一，设置后会自动触发<code>UNIQUE</code>设置</td>
+</tr>
+<tr>
+<td>[options.indexes[]<br/>.concurrently=false]</td>
+<td>Boolean</td>
+<td>PostgreSQL 中在创建索引时不使用任务写锁定。仅 Postgres 适用</td>
+</tr>
+<tr>
+<td>[options.indexes[].fields]</td>
+<td>Array.&lt;String | Object&gt;</td>
+<td>建立索引的字段数组。每个字段可以是一个字段名，sequelize 对象 (如 <code>sequelize.fn</code>)，<br/>或一个包含：<code>attribute</code> (字段名)、<code>length</code> (创建前缀字符数)、<code>order</code> (列排序方向)、<code>collate</code> (较验的字段集合 (排序))</td>
+</tr>
+<tr>
+<td>[options.createdAt]</td>
+<td>String | Boolean</td>
+<td>如果为字符串，则使用提供的值代替 createdAt 列的默认名，设置为<code>flase</code>则不添加这个字段。</td>
+</tr>
+<tr>
+<td>[options.updatedAt]</td>
+<td>String | Boolean</td>
+<td>如果为字符串，则使用提供的值代替 updatedAt 列的默认名，设置为<code>flase</code>则不添加这个字段</td>
+</tr>
+<tr>
+<td>[options.deletedAt]</td>
+<td>String | Boolean</td>
+<td>如果为字符串，则使用提供的值代替 deletedAt 列的默认名，设置为<code>flase</code>则不添加这个字段</td>
+</tr>
+<tr>
+<td>[options.tableName]</td>
+<td>String</td>
+<td>模型所对应表的表名，设置freezeTableName 为 true时，才会严格使用模型名</td>
+</tr>
+<tr>
+<td>[options.getterMethods]</td>
+<td>Object</td>
+<td>提供给 getter 调用的方法，与每列定义的访问器一样。如果为列定义了一个相同名称的 getter 方法，那么会通过这个方法获取值；如果未定义的名称与列不匹配，这将做为一个虚拟访问器；也用于设置多个值，但不能用在。</td>
+</tr>
+<tr>
+<td>[options.setterMethods]</td>
+<td>Object</td>
+<td>提供给 setter 调用的方法，与每列定义的设置器一样。如果为列定义了一个相同名称的 setter 方法，那么会通过这个方法设置值；如果未定义的名称与列不匹配，这将做为一个虚拟访设置；也用于匹配多个值，但不用于逻辑删除。</td>
+</tr>
+<tr>
+<td>[options.instanceMethods]</td>
+<td>Object</td>
+<td>提供给每个实例（DAO）的方法。如果通过sequelize对方法进行了重写，可以通过"this.constructor.super_.prototype"来调用原方法，如：this.constructor.super_.prototype.toJSON.apply(this, arguments)</td>
+</tr>
+<tr>
+<td>[options.classMethods]</td>
+<td>Object</td>
+<td>添加到<code>Model</code>的类方法，如果通过sequelize对方法进行了重写，可以通过 <code>this.constructor.prototype</code>来调用原方法，如：this.constructor.prototype.find.apply(this, arguments)</td>
+</tr>
+<tr>
+<td>[options.schema='public']</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.engine]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.charset]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.comment]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.collate]</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.initialAutoIncrement]</td>
+<td>String</td>
+<td>MySQL中设置 AUTO_INCREMENT （自增）的初始值</td>
+</tr>
+<tr>
+<td>[options.hooks]</td>
+<td>Object</td>
+<td>一个包含钩子函数的对象，这些函数会在生生命周期内某些事件发生之前或之后被调用。可添加的钩子函数有：beforeValidate, afterValidate, beforeBulkCreate, beforeBulkDestroy, beforeBulkUpdate, beforeCreate, beforeDestroy, beforeUpdate, afterCreate, afterDestroy, afterUpdate, afterBulkCreate, afterBulkDestory 和 afterBulkUpdate。每个属性可以是一个函数，或是一个包含一组函数的数组。</td>
+</tr>
+<tr>
+<td>[options.validate]</td>
+<td>Object</td>
+<td>模型广泛验证对象。该验证会通过<code>this</code>。如果验证函数中有参数，则会被认为是异步的，并通过一个包含可选错误的回调函数形式的的调。</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-model">2.31 <code>sequelize.model()</code> - 获取模型</h4>
+<pre>sequelize.model(modelName]) -> Model</pre>
+<p>获取一个已经定义的模型。<code>modelName</code>表示通过<code>sequelize.define</code>定义的模型名。</p>
+<p><br /></p>
+<h4 id="api-instance-isDefined">2.32 <code>sequelize.isDefined()</code> - 检查模型是否定义</h4>
+<pre>sequelize.isDefined(modelName) -> Boolean</pre>
+<p>检查模型是否已经定义。<code>modelName</code>表示通过<code>sequelize.define</code>定义的模型名。</p>
+<p><br /></p>
+<h4 id="api-instance-import">2.33 <code>sequelize.import()</code> - 模型导入</h4>
+<pre>sequelize.import(path) -> Model</pre>
+<p>通过文件导入模型定义。检查模型是否已经定义。</p>
+<p>被导入的模型会被缓存，所以多次导入并不会重复加载</p>
+<p><code>path</code>表示要导入文件的路径，如果使用相对路径会自动转换为绝对路径。</p>
+<p><br /></p>
+<h4 id="api-instance-query">2.34 <code>sequelize.query()</code> - 执行查询</h4>
+<pre>sequelize.query(sql, [options={}]) -> Promise</pre>
+<p>执行原始SQL 语句进行查询</p>
+<p>默认情况下，返回值中有两个参数：一个包含结果的数组，一个元数据对象。可以通过<code>.spread</code>方法来查看结果。</p>
+<p>如果不想使用原始查询结果，可以第二个可选参数中传一个<code>type</code>参数，并指定查询的类型。设置后，sequelize会对结果进行格式化：</p>
+<pre>sequelize.query('SELECT...').spread(function (results, metadata) {
+  // Raw query - use spread
+});
+
+sequelize.query('SELECT...', { type: sequelize.QueryTypes.SELECT }).then(function (results) {
+  // SELECT query - use then
+})</pre>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sql</td>
+<td>String</td>
+<td></td>
+</tr>
+<tr>
+<td>[options={}]</td>
+<td>Object</td>
+<td>查询选项</td>
+</tr>
+<tr>
+<td>[options.raw]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>时，sequelize 不会查询结果进行格式化，或不会根据结果构建实例</td>
+</tr>
+<tr>
+<td>[options.transaction=null]</td>
+<td>Transaction</td>
+<td>为查询指定事务</td>
+</tr>
+<tr>
+<td>[options.type='RAW']</td>
+<td>String</td>
+<td>执行的查询类型，sequelize会根据这个类型对返回结果格式化。可以设置为一个字符串，或是通过<a href="#api-QueryTypes"><code>Sequelize.QueryTypes</code></a>来设置</td>
+</tr>
+<tr>
+<td>[options.nest=false]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>，会使用<a href="https://github.com/mickhansen/dottie.js">dottie.js</a>库，转换通过<code>.</code>设置的对象层级关系。如：<code>{ 'user.username': 'john' }</code> 会被转换为 <code>{ user: { username: 'john' }}</code>。设置<code>true</code>后，查询类型如未明确指定，则使用<code>'SELECT'</code></td>
+</tr>
+<tr>
+<td>[options.plain=false]</td>
+<td>Boolean</td>
+<td>设置查询类型为 <code>SELECT</code> 并返回单行结果</td>
+</tr>
+<tr>
+<td>[options.replacements]</td>
+<td>Object | Array</td>
+<td>替换<code>:param</code>格式的查询参数对象，或用于替换SQL中<code>?</code>符号的参数数组</td>
+</tr>
+<tr>
+<td>[options.bind]</td>
+<td>Object | Array</td>
+<td><code>$param</code>格式绑定参数的对象，或未命令绑定参数数组，会替换SQL中的<code>$1, $2, ...</code></td>
+</tr>
+<tr>
+<td>[options.useMaster=false]</td>
+<td>Boolean</td>
+<td>强制查询使用写池，而不管查询类型</td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>一个用打印执行的SQL语句的函数</td>
+</tr>
+<tr>
+<td>[options.instance]</td>
+<td>Instance</td>
+<td>用于sequelize 实例，用于从查询结果中构建实例</td>
+</tr>
+<tr>
+<td>[options.model]</td>
+<td>Model</td>
+<td>用于sequelize 模型，用于从查询结果中构建实例</td>
+</tr>
+<tr>
+<td>[options.retry]</td>
+<td>Object</td>
+<td>设置自动重试的控制标识对象</td>
+</tr>
+<tr>
+<td>[options.retry.match]</td>
+<td>Array</td>
+<td>发生错误时，匹配到数组中的标识后自动重试</td>
+</tr>
+<tr>
+<td>[options.retry.max]</td>
+<td>Integer</td>
+<td>设置最大重试次数</td>
+</tr>
+<tr>
+<td>[options.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>一个用于指定 schema 的 search_path 的可选项(仅 Postgres 适用)</td>
+</tr>
+<tr>
+<td>[options.supportsSearchPath]</td>
+<td>Boolean</td>
+<td>是否使用 searchPath (仅 Postgres 适用)</td>
+</tr>
+<tr>
+<td>[options.mapToModel=false]</td>
+<td>Object</td>
+<td>字段到模型的映射关系，当提供<code>options.model</code> 或 <code>options.instance</code>时。映射会在建立模型实例之前进行</td>
+</tr>
+<tr>
+<td>[options.fieldMap]</td>
+<td>Object</td>
+<td>当为 <code>SELECT</code>查询时，映射字段与属性名</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-set">2.35 <code>sequelize.set()</code> - 设置变量</h4>
+<pre>sequelize.set(variables, options) -> Promise</pre>
+<p>设置一个变量，设置后将会执行基于环境变量或用户变量的查询。此变量会在每次建立连接时设置，仅MySQL 适用。</p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>variables</td>
+<td>Object</td>
+<td>包含多个变量的对象</td>
+</tr>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>查询选项</td>
+</tr>
+<tr>
+<td>options.transaction</td>
+<td>Transaction</td>
+<td>是否在事务中执行查询</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-escape">2.36 <code>sequelize.escape()</code> - 编码</h4>
+<pre>sequelize.escape(value) -> String</pre>
+<p>对值<code>value</code>进行编码并返回编码结果。</p>
+<p><br /></p>
+<h4 id="api-instance-createSchema">2.37 <code>sequelize.createSchema()</code> - 创建数据库 schema</h4>
+<pre>sequelize.createSchema(schema, options={}) -> Promise</pre>
+<p>创建一个新的数据库 schema </p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>schema</td>
+<td>String</td>
+<td>schema 名</td>
+</tr>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>选项</td>
+</tr>
+<tr>
+<td>options.logging</td>
+<td>Boolean | function</td>
+<td>日志打印函数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-showAllSchemas">2.38 <code>sequelize.showAllSchemas()</code> - 查询已定义的schema</h4>
+<pre>sequelize.showAllSchemas(options={}) -> Promise</pre>
+<p>查询数据库中已定义的schema </p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>选项</td>
+</tr>
+<tr>
+<td>options.logging</td>
+<td>Boolean | function</td>
+<td>日志打印函数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-dropSchema">2.39 <code>sequelize.dropSchema()</code> - 删除定义的schema</h4>
+<pre>sequelize.dropSchema(schema, options={}) -> Promise</pre>
+<p>删除数据库中已定义指定名称的schema</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>schema</td>
+<td>String</td>
+<td>schema 名</td>
+</tr>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>选项</td>
+</tr>
+<tr>
+<td>options.logging</td>
+<td>Boolean | function</td>
+<td>日志打印函数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-dropAllSchemas">2.40 <code>sequelize.dropAllSchemas()</code> - 删除所有schema</h4>
+<pre>sequelize.dropAllSchemas(options={}) -> Promise</pre>
+<p>删除数据库中所有已定义的schema</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>选项</td>
+</tr>
+<tr>
+<td>options.logging</td>
+<td>Boolean | function</td>
+<td>日志打印函数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-sync">2.41 <code>sequelize.sync()</code> - 同步模型到数据库</h4>
+<pre>sequelize.sync([options={}]) -> Promise</pre>
+<p>同步所有已定义的模型到数据库中</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options={}]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.force=false]</td>
+<td>Boolean</td>
+<td>设置为 true，会在创建表前先删除原表，即：DROP TABLE IF EXISTS ...</td>
+</tr>
+<tr>
+<td>[options.match]</td>
+<td>RegEx</td>
+<td> 添加匹配规则，只重建匹配的表，在<code>force: true</code>时非常有用</td>
+</tr>
+<tr>
+<td>[options.logging=console.log]</td>
+<td>Boolean | function</td>
+<td>执行SQL的日志打印函数</td>
+</tr>
+<tr>
+<td>[options.schema='public']</td>
+<td>String</td>
+<td>创建表的 schema 。这一选项可以每个表的 <code>sequelize.define</code>中重写</td>
+</tr>
+<tr>
+<td>[options.searchPath=DEFAULT]</td>
+<td>String</td>
+<td>一个用于指定 schema 的 search_path 的可选项(仅 Postgres 适用)</td>
+</tr>
+<tr>
+<td>[options.hooks=true]</td>
+<td>Boolean</td>
+<td>设置为<code>true</code>时，会调用同步相关的钩子函数：beforeSync、afterSync、beforBulkSync、afterBulkSync</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-truncate">2.42 <code>sequelize.truncate()</code> - 截断已定义的表</h4>
+<pre>sequelize.truncate([options]) -> Promise</pre>
+<p>截断所有已定义的模型所对应的表，这个操作实际上是调用每个模型的<code>Model.truncate()</code>方法</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>选项</td>
+</tr>
+<tr>
+<td>options.transaction</td>
+<td>Boolean | function</td>
+<td></td>
+</tr>
+<tr>
+<td>options.logging</td>
+<td>Boolean | function</td>
+<td>日志打印函数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-drop">2.43 <code>sequelize.drop()</code> - 删除表</h4>
+<pre>sequelize.drop(options) -> Promise</pre>
+<p>删除所有已定义的模型所对应的表，这个操作实际上是调用每个模型的<code>Model.drop()</code>方法</p>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>options</td>
+<td>Object</td>
+<td>选项</td>
+</tr>
+<tr>
+<td>options.logging</td>
+<td>Boolean | function</td>
+<td>日志打印函数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-authenticate">2.44 <code>sequelize.authenticate()</code> - 验证连接</h4>
+<pre>sequelize.authenticate() -> Promise</pre>
+<p>验证已建立的连接</p>
+<p><strong>别名：<code>validate</code></strong></p>
+<p><br /></p>
+<h4 id="api-instance-fn">2.45 <code>sequelize.fn()</code> - 函数调用</h4>
+<pre>sequelize.fn(fn, args) -> Sequelize.fn</pre>
+<p>创建于一个相当于数据库函数的对象。该函数可用于搜索查询的<code>where</code>和<code>order</code>部分，以及做为列定义的默认值。如果想在列中引用你定义的函数，就要使用<code>sequelize.col</code>，这样列就能正确的解析，而不是解析为字符串。</p>
+<p>如，将<code>username</code>字段值解析为大写形式：</p>
+<pre>instance.updateAttributes({
+  username: self.sequelize.fn('upper', self.sequelize.col('username'))
+})</pre>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fn</td>
+<td>String</td>
+<td>要调用的函数</td>
+</tr>
+<tr>
+<td>args</td>
+<td>any</td>
+<td>传递给调用函数的参数</td>
+</tr>
+</tbody>
+</table>
+<p><br /></p>
+<h4 id="api-instance-col">2.46 <code>sequelize.col()</code> - 列对象</h4>
+<pre>col(col) -> Sequelize.col</pre>
+<p>创建一个相当于数据库列的对象。这个方法经常结合<code>sequelize.fn</code>使用，它可以保证将列名正确的传递给该方法，而不是经过转义。</p>
+<p><code>col</code>－表示列名</p>
+<p><br /></p>
+<h4 id="api-instance-cast">2.47 <code>sequelize.cast()</code> - cast函数</h4>
+<pre>cast(val, type) -> Sequelize.cast</pre>
+<p>创建一个表示cast函数调用的对象</p>
+<ul>
+  <li><code>val</code>－{any}，cast的值</li>
+  <li><code>type</code>－{String}，cast类型</li>
+</ul>
+<p><br /></p>
+<h4 id="api-instance-literal">2.48 <code>sequelize.literal()</code> - 字面量对象</h4>
+<pre>literal(val) -> Sequelize.literal</pre>
+<p>创建一个字面量对象，该值不会转义</p>
+<p><strong>别名：<code>asIs</code></strong></p>
+<p>更多关于<code>sequelize.literal()</code>的使用请参考：</p>
+<ul>
+  <li><a href="http://itbilu.com/nodejs/npm/N1pPjUdMf.html#multi" target="_blank"><code>字段值批量自增、自减</code></a></li>
+</ul>
+<p><br /></p>
+<h4 id="api-instance-and">2.49 <code>sequelize.and()</code> - AND查询</h4>
+<pre>and(args) -> Sequelize.and</pre>
+<p>AND查询</p>
+<ul>
+  <li><code>val</code>－{String | Object}，会被AND连接的参数</li>
+</ul>
+<p><br /></p>
+<h4 id="api-instance-or">2.50 <code>sequelize.or()</code> - OR查询</h4>
+<pre>or(args) -> Sequelize.or</pre>
+<p>OR查询</p>
+<ul>
+  <li><code>val</code>－{String | Object}，会被OR连接的参数</li>
+</ul>
+<p><br /></p>
+<h4 id="api-instance-json">2.51 <code>sequelize.json()</code> - json嵌套对象</h4>
+<pre>json(conditions, [value]) -> Sequelize.json</pre>
+<p>生成一个Postgre中json类型的嵌套对象</p>
+<ul>
+  <li><code>conditions</code>－{String | Object}，一个能够被postgres json 语法解析以的嵌套对象</li><li><code>[value]</code>－{String | Object}，可选的比较值，会生成 "&lt;json path&gt; = '&lt;value&gt;'"</li>
+</ul>
+<p><br /></p>
+<h4 id="api-instance-where">2.52 <code>sequelize.where()</code> - 指定WHERE条件</h4>
+<pre>json(conditions, [value]) -> Sequelize.json</pre>
+<p>指定属性＝条件。</p>
+<p>属性也可以从<code>Model.rawAttributes</code>对象获取（如：<code>Model.rawAttributes.id</code>、<code>Model.rawAttributes.name</code>）。属性应该已在模型中定义。也可以从sequelize工具函数中获取（如：<code>sequelize.fn,</code>、<code>sequelize.col</code></p>
+<p>当使用字符串属性是，用于<code>{ where: { attr: something }}</code>语法。如果不希望属性被转义，请使用<code>sequelize.literal</code>。</p>
+<ul>
+  <li><code>attr</code>－{Object}，属性</li>
+  <li><code>[comparator='=']</code>－{String}</li>
+  <li><code>logic</code>－{String ｜ Object}，限制条件可以是简单字符串或进一步的条件对象（如：<code>$or</code>、<code>$and</code>、<code>.litera</code>）</li>
+</ul>
+<p><strong>别名：<code>condition</code></strong></p>
+<p><br /></p>
+<h4 id="api-instance-transaction">2.53 <code>sequelize.transaction()</code> - 启动事务</h4>
+<pre>sequlize.transaction([options={}]) -> Promise</pre>
+<p>启动一个事务。当使用事务时，需要将事务做为一个可选参数<code>transaction</code>传入，然后查询就会在传入的事务下执行：</p>
+<pre>sequelize.transaction().then(function (t) {
+  return User.find(..., { transaction: t}).then(function (user) {
+    return user.updateAttributes(..., { transaction: t});
+  })
+  .then(t.commit.bind(t))
+  .catch(t.rollback.bind(t));
+})</pre>
+<p>事务支持自动提交或回滚，当使用promise链接调用时会自动完成：</p>
+<pre>sequelize.transaction(function (t) { 
+  // 注意，这时使用的是callback而不是promise.then()
+  return User.find(..., { transaction: t}).then(function (user) {
+    return user.updateAttributes(..., { transaction: t});
+  });
+}).then(function () {
+  // Committed
+}).catch(function (err) {
+  // Rolled back
+  console.error(err);
+});</pre>
+<p>启用<code>CLS</code>命名空间时，事务分被自动挂载。</p>
+<pre>var cls = require('continuation-local-storage'),
+    ns = cls.createNamespace('....');
+var Sequelize = require('sequelize');
+Sequelize.cls = ns;</pre>
+<p><strong>相关</strong></p>
+<ul>
+  <li><a href="http://itbilu.com/nodejs/npm/EJO6CcCM-.html" target="_blank">Transaction</a></li>
+</ul>
+<p><strong>参数</strong></p>
+<table class="table table-striped table-condensed">
+<thead>
+<tr>
+<th>名称</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>[options={}]</td>
+<td>Object</td>
+<td></td>
+</tr>
+<tr>
+<td>[options.autocommit=true]</td>
+<td>Boolean</td>
+<td>是否自动提交</td>
+</tr>
+<tr>
+<td>[options.type='DEFERRED']</td>
+<td>String</td>
+<td>查看<code>Sequelize.Transaction.TYPES</code>，仅 Sqlite 适用</td>
+</tr>
+<tr>
+<td>[options.isolationLevel<br/>='REPEATABLE_READ']</td>
+<td>String</td>
+<td>事务的隔离级别，参见<code>Sequelize.Transaction.ISOLATION_LEVELS</code></td>
+</tr>
+<tr>
+<td>[options.logging=false]</td>
+<td>Function</td>
+<td>用于打印执行SQL的函数</td>
+</tr>
+</tbody>
+</table>
+                        </div>
+                   </article>
+                   <div>
+
+	<p>下一篇：<a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定义、使用与Model类的API</a>
+
+
+	<p>上一篇：<a href="/nodejs/npm/V1Xn7hb--.html">［Node.js与数据库］支持多种数据库的ORM框架 Sequelize</a>
+
+</div>
+              </div>
+
+              <div id="sidebar" class="col-sm-4 col-md-4">
+                  <aside class="widget">
+    <form method="post" action="/search" class="form-horizontal">
+    <div class="form-group">
+        <div class="col-sm-9">
+            <input placeholder="关键字" name="keyword" class="form-control" type="text"  >
+        </div>
+        <div class="col-sm-3">
+            <button type="submit" class="btn btn-default">&nbsp;&nbsp;搜索&nbsp;&nbsp;</button>
+        </div>
+    </div>
+    </form>
+</aside>
+                  
+<aside class="widget">
+    <h4>文章分类</h4>
+    <ul class="grove-list">
+    
+    	
+    		<li><a href="/nodejs/core">基础、核心、API</a></li>
+    	
+    
+    	
+    		<li class="active"><a href="#">包、应用</a></li>
+    	
+    
+    </ul>
+</aside>
+
+                  
+<aside class="widget">
+    <h4>阅读排行</h4>
+    <ul class="grove-list">
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VkYIaRPz-.html">Sequelize 中文API文档－1. 快速入门、Seq...</a> (111793)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/V1PExztfb.html">Sequelize 中文API文档－2. Model 的定...</a> (111550)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJIR1CjMb.html">Sequelize 中文API文档－4. 查询与原始查询</a> (36951)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/linux/management/NymXRUieg.html">解决类似 /usr/lib64/libstdc++.so....</a> (36371)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/41qaV3czb.html">Sequelize 中文API文档－3. 模型（表）之间的...</a> (31834)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/EkwKysXIl.html">HTTP请求方法：GET、HEAD、POST、PUT、DE...</a> (14940)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/javascript/js/41KMSZ9a.html">［ES6］Promise对象Promise.all()方法...</a> (13937)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/N1sdaHTzb.html">Sequelize 中文API文档－5. 实例的使用、In...</a> (13690)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/VJHw6ScNb.html">bluebird与原生Promise对象及bluebird...</a> (12755)</h5>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/database/mongo/E1tWQz4_e.html">MongoDB索引管理－索引的创建、查看、删除</a> (12430)</h5>
+         </li>
+        
+    </ul>
+</aside>
+
+                  <aside class="widget">
+    <h4>最新文章</h4>
+    <ul class="grove-list">
+    
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/core/Sy-2trZhQ.html">Node.js 的 Http/2 模块</a></h5>
+              <p><code>http2</code>模块是自Node.js<code>v8.4.0</code>起...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/r1IhFZV-X.html">Blockly 创建自定义块-Blockly 开发者工具</a></h5>
+              <p>Blockly Developer Tools 是一个基于Web的开发者工具，它可以通过配置自动化...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/other/relate/H1huYbEWQ.html">Blockly 创建自定义块-概述</a></h5>
+              <p>将 Blockly 集成到应用中后，或多或少总是需要创建一些<code>"块"</code>。本篇...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/S1BhIhdtG.html">Sequelize 嵌套模型查询及嵌套模型字段排序</a></h5>
+              <p>Sequelize 的“嵌套模型查询”最终会生成SQL“连接查询”语句，即生成'inner joi...</p>
+         </li>
+        
+        <li> <h5 class="media-heading"><a href="/nodejs/npm/By7L5p3ff.html">gyp 文件输入格式参考</a></h5>
+              <p><code>GYP</code>（node-gyp）基于<code>.gyp</code>文件构建...</p>
+         </li>
+        
+    
+    </ul>
+</aside>
+                  <!-- <aside class="widget">
+    <h4>广告</h4>
+    <p><a href="http://redirect.simba.taobao.com/rd?w=unionnojs&f=http%3A%2F%2Fai.taobao.com%2Fauction%2Fedetail.htm%3Fe%3D80FuZnNB1TS6k0Or%252B%252BH4tPg7Qoo6gIwW72fxp1Fq8BiLltG5xFicOdXrTUTgh9sMDPIwxrc30rhDsYaO8QAt%252FkUldzjpLCiPsn0%252BfXTZJrM4I6TE1Mm7FG3abJM7sDg2X7UB%252FLMklcjcDCUJyXw5Pg%253D%253D%26ptype%3D100010%26from%3Dbasic&k=5ccfdb950740ca16&c=un&b=alimm_0&p=mm_26749822_9476439_31826248" rel="nofollow">一包饼〜〜〜</a></p>
+</aside> -->
+                  
+
+                  <aside class="widget">
+    <h4>交流群：564850876</h4>
+    <p><img src="/img/qq-group.png" alt="交流群：564850876" /></p>
+</aside>
+                  <!-- <aside class="widget last">
+	<h4>友情链接</h4>
+	<ul class="grove-list">
+	     <li><a href="http://www.koocode.com" target="_blank">酷码</a></li>
+	</ul>
+</aside> -->
+              </div>
+         </div>
+    </section>
+</div>
+<script type="text/javascript">
+var xhr = new XMLHttpRequest();
+xhr.open("put", "/nodejs/npm/VkYIaRPz-.html", true);
+// xhr.onreadystatechange = function() { if (xhr.readyState == 4) {console.log(xhr.responseText);}}
+xhr.send();
+</script>
+<footer>
+<div class="container">
+    <!-- <div class="row info">
+        <div class="col-sm-3 residence">
+        
+        </div>
+        <div class="col-sm-5 touch">
+            <ul>
+                <li><strong></strong></li>
+                <li>email：</strong>cn.liuht@gmail.com</li>
+            </ul>
+        </div>
+    </div> -->
+    <div class="row credits">
+        <div class="col-md-12">
+            <div class="row copyright">
+                <div class="col-md-12">
+                 Copyright ©2015-2017 www.itbilu.com all rights reserved<a href="http://www.miitbeian.gov.cn/" target="_blank">京ICP备11014171号-3</a>
+                </div>
+            </div>
+        </div>            
+    </div>
+</div>
+</footer>
+</div>
+<script type="text/javascript" src="//cdn.itbilu.com/js/main-min.js"></script>
+<script type="text/javascript">
+	$(function () { $("[data-toggle='tooltip']").tooltip(); });
+	
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?2249745ad1ce80c1744fc6aede553fc1";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	 
+	(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+	})();
+</script>
+</body>
+</html>

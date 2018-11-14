@@ -28,7 +28,7 @@ module.exports = (app) => {
 			res.status(code).json(result);
 			// res.json(result);
 		};
-		let methods = [{
+		const methods = [{
 			method: 'ok',
 			status: 200
 		}, {

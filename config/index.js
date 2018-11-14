@@ -1,4 +1,7 @@
 const config = {
+  project: {
+    port: 3000
+  },
   mongodb: {
     // user: 'admin',
     // pwd: '123456',
@@ -7,14 +10,23 @@ const config = {
     database: 'weixin',
     // authSource: 'admin',
   },
+  // mysql: {
+  //   username: 'hlm',
+  //   password: 'Root@123',
+  //   host: 'localhost',
+  //   port: '3306',
+  //   // database: 'weixin',
+  //   database: 'node',
+  //   dialect: 'mysql',
+  // },
   mysql: {
-    username: 'hlm',
+    username: 'root',
     password: 'Root@123',
     host: 'localhost',
     port: '3306',
     // database: 'weixin',
     database: 'node',
     dialect: 'mysql',
-  },
+  }
 };
 module.exports = config;
