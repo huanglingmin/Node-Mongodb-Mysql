@@ -3,6 +3,7 @@ const router = express.Router();
 const USER = require('../../service/userService');
 const AETICLE = require('../../service/articleService');
 const Utils = require('../../tool/utils');
+const lang = require('lodash/fp/lang.js');
 
 // 登陆
 router.post('/login', async function (req, res, next) {
@@ -39,9 +40,14 @@ router.get('/outLogin', (req, res, next) => {
 // 获取用户列表
 router.get('/userList', async (req, res, next) => {
   // console.log(Utils.unsign(req.headers.cookie, 'USERSESSION'));
-  req.query.pageNum = Math.floor(req.query.pageNum);
-  req.query.pageSize = Math.floor(req.query.pageSize);
-  const result = await USER.getUserList(req.query.pageNum, req.query.pageSize);
+  let result = {};
+  if (lang.isEmpty(req.query)) {
+    result = await USER.getUserList();
+  } else {
+    req.query.pageNum = Math.floor(req.query.pageNum);
+    req.query.pageSize = Math.floor(req.query.pageSize);
+    result = await USER.getUserList(req.query.pageNum, req.query.pageSize);
+  }
   if (result) {
     res.ok('success', result)
   } else {
